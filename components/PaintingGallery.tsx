@@ -38,14 +38,42 @@ export default function PaintingGallery({
     return () => window.removeEventListener("paintx:search", handler);
   }, []);
 
-  // Restore scroll position when returning from a detail page
+  // Continuously mirror gallery state to sessionStorage so "back" can restore it
   useEffect(() => {
-    const saved = sessionStorage.getItem("galleryScrollPos");
-    if (saved) {
-      sessionStorage.removeItem("galleryScrollPos");
-      window.scrollTo({ top: parseInt(saved, 10), behavior: "instant" });
+    if (paintings.length === 0) return;
+    try {
+      sessionStorage.setItem("galleryPaintings", JSON.stringify(paintings));
+      sessionStorage.setItem("galleryPage", String(page));
+      sessionStorage.setItem("galleryHasMore", String(hasMore));
+      sessionStorage.setItem("gallerySearch", search);
+    } catch {} // ignore QuotaExceededError
+  }, [paintings, page, hasMore, search]);
+
+  // Restore paintings + scroll when returning from a detail page
+  useEffect(() => {
+    const savedScroll = sessionStorage.getItem("galleryScrollPos");
+    if (!savedScroll) return;
+
+    const raw = sessionStorage.getItem("galleryPaintings");
+    if (raw) {
+      try {
+        const restoredPaintings: PaintingListItem[] = JSON.parse(raw);
+        const restoredPage   = parseInt(sessionStorage.getItem("galleryPage") ?? "1", 10);
+        const restoredHasMore = sessionStorage.getItem("galleryHasMore") !== "false";
+        const restoredSearch  = sessionStorage.getItem("gallerySearch") ?? "";
+        setPaintings(restoredPaintings);
+        setPage(restoredPage);
+        setHasMore(restoredHasMore);
+        setSearch(restoredSearch);
+        isFetching.current = false;
+      } catch {}
     }
-  }, []);
+
+    const scrollPos = parseInt(savedScroll, 10);
+    sessionStorage.removeItem("galleryScrollPos");
+    // Delay scroll until React has painted the restored list
+    setTimeout(() => window.scrollTo({ top: scrollPos, behavior: "instant" }), 150);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchMore = useCallback(
     async (nextPage: number, searchQuery: string, append: boolean) => {

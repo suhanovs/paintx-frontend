@@ -35,10 +35,11 @@ export default function Navbar({ onSearch }: NavbarProps) {
   return (
     <div className="hidden sm:block w-full">
       <nav className="fixed top-0 z-50 w-full bg-black shadow-lg border-b border-gray-800 px-4 h-20">
-        <div className="flex items-center justify-between w-full h-full gap-6">
+        {/* 3-column grid: logo left | search centered | buttons right */}
+        <div className="grid grid-cols-[auto_1fr_auto] items-center w-full h-full">
 
-          {/* Logo — px-6 to match .ru NavbarBrand padding */}
-          <div className="flex items-center px-6 flex-shrink-0">
+          {/* Logo */}
+          <div className="flex items-center px-6">
             <Link href="/">
               <Image
                 src="/logo.jpg"
@@ -51,9 +52,9 @@ export default function Navbar({ onSearch }: NavbarProps) {
             </Link>
           </div>
 
-          {/* Search — flex-grow capped at max-w-sm (~384px) to match .ru NavbarItem width.
-              bg-gray-800 + no border = NextUI dark-theme Input default appearance. */}
-          <div className="flex-grow max-w-sm relative">
+          {/* Search — centered in the middle column */}
+          <div className="flex justify-center px-4">
+          <div className="w-full max-w-sm relative">
             <div className="flex items-center bg-zinc-800 rounded-xl px-4 py-2 transition-colors">
               <Icon
                 icon="fluent:search-20-regular"
@@ -76,6 +77,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                 </button>
               )}
             </div>
+          </div>
           </div>
 
           {/* Contact buttons — bg-gray-700, p-2, 24px icons, hover:scale-110 — matches .ru exactly */}
