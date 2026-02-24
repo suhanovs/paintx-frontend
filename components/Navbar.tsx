@@ -5,9 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 
-const TELEGRAM_URL = "https://t.me/+79119690469";
-const YOUTUBE_URL = "https://youtu.be/tHY3NkSewy8";
-const WHATSAPP_URL = "https://wa.me/79119690469";
+const TELEGRAM_URL  = "https://t.me/+79119690469";
+const YOUTUBE_URL   = "https://youtu.be/tHY3NkSewy8";
+const WHATSAPP_URL  = "https://wa.me/79119690469";
 const YANDEX_MAPS_URL = "https://yandex.ru/maps/org/paintx/49452764850";
 
 interface NavbarProps {
@@ -47,8 +47,8 @@ export default function Navbar({ onSearch }: NavbarProps) {
             />
           </Link>
 
-          {/* Search */}
-          <div className="flex-1 max-w-xl relative">
+          {/* Search — takes full available width on mobile */}
+          <div className="flex-1 relative">
             <div className="flex items-center bg-gray-900 rounded-full px-4 py-2 border border-gray-700 focus-within:border-gray-500 transition-colors">
               <Icon
                 icon="fluent:search-20-regular"
@@ -73,8 +73,8 @@ export default function Navbar({ onSearch }: NavbarProps) {
             </div>
           </div>
 
-          {/* Social buttons */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Social buttons — desktop only (mobile: see MobileBottomBar) */}
+          <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => window.open(TELEGRAM_URL, "_blank")}
               className="bg-gray-800 text-white p-2 rounded-full hover:bg-blue-600 transition-colors"
@@ -91,14 +91,14 @@ export default function Navbar({ onSearch }: NavbarProps) {
             </button>
             <button
               onClick={() => window.open(WHATSAPP_URL, "_blank")}
-              className="hidden sm:flex bg-gray-800 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
+              className="bg-gray-800 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
               title="WhatsApp"
             >
               <Icon icon="simple-icons:whatsapp" width={20} height={20} />
             </button>
             <button
               onClick={() => window.open(YANDEX_MAPS_URL, "_blank")}
-              className="hidden sm:flex bg-gray-800 text-white p-2 rounded-full hover:bg-yellow-500 transition-colors"
+              className="bg-gray-800 text-white p-2 rounded-full hover:bg-yellow-500 transition-colors"
               title="Find us on the map"
             >
               <Icon icon="mdi:map-marker" width={20} height={20} />

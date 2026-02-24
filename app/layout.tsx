@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import MobileBottomBar from "@/components/MobileBottomBar";
 
 export const metadata: Metadata = {
   title: "PaintX — Art Gallery",
@@ -21,7 +22,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-black text-white antialiased">{children}</body>
+      <body className="bg-black text-white antialiased">
+        {/* Extra bottom padding on mobile so content doesn't hide behind the sticky bottom bar */}
+        <div className="pb-16 sm:pb-0">
+          {children}
+        </div>
+        <MobileBottomBar />
+      </body>
     </html>
   );
 }

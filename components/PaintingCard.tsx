@@ -16,8 +16,9 @@ const UNKNOWN = ["Unknown style", "Неизвестный стиль", "Unknown"
 const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
   ({ painting }, ref) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLiked, setIsLiked] = useState(false);
 
-    const mid = midUrl(painting.image_mid_res_filename);
+    const mid  = midUrl(painting.image_mid_res_filename);
     const full = fullUrl(painting.image_mid_res_filename);
 
     return (
@@ -35,13 +36,32 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
             </div>
           )}
 
+          {/* Heart / Like button */}
+          <button
+            aria-label={isLiked ? "Unlike" : "Like"}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsLiked((v) => !v);
+            }}
+            className="absolute right-6 top-6 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm transition-colors hover:bg-black/70"
+          >
+            <Icon
+              icon="solar:heart-bold"
+              width={18}
+              className={isLiked ? "text-red-500" : "text-white/60"}
+            />
+          </button>
+
           {/* Image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={mid}
             alt={painting.title || painting.title_ru || "Painting"}
             className="w-full aspect-square object-cover rounded-lg cursor-pointer select-none"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              // Desktop: open lightbox. Mobile: navigate to detail page (via Details link below).
+              if (window.innerWidth > 640) setIsModalOpen(true);
+            }}
             onContextMenu={(e) => e.preventDefault()}
             draggable={false}
             loading="lazy"
