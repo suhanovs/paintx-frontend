@@ -8,55 +8,55 @@ const YOUTUBE_URL  = "https://youtu.be/tHY3NkSewy8";
 const WHATSAPP_URL = "https://wa.me/79119690469";
 const MAPS_URL     = "https://yandex.ru/maps/org/paintx/49452764850";
 
-const links = [
-  { href: TELEGRAM_URL, icon: "simple-icons:telegram", label: "Telegram", hover: "hover:text-blue-400"   },
-  { href: WHATSAPP_URL, icon: "simple-icons:whatsapp", label: "WhatsApp", hover: "hover:text-green-400"  },
-  { href: YOUTUBE_URL,  icon: "simple-icons:youtube",  label: "YouTube",  hover: "hover:text-red-400"    },
-  { href: MAPS_URL,     icon: "mdi:map-marker",        label: "Find us",  hover: "hover:text-yellow-400" },
-];
-
 export default function MobileBottomBar() {
-  const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
+  const [scrollDir, setScrollDir] = useState<"up" | "down">("up");
+  const prevY = useRef(0);
 
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      // Hide when scrolling down past 60px; show when scrolling up
-      if (y > lastY.current && y > 60) {
-        setHidden(true);
-      } else {
-        setHidden(false);
-      }
-      lastY.current = y;
+      if (y > prevY.current && y > 50) setScrollDir("down");
+      else if (y < prevY.current) setScrollDir("up");
+      prevY.current = y;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const hidden = scrollDir === "down";
+
   return (
-    <nav
-      aria-label="Contact"
-      className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-black/95 border-t border-gray-800 transition-transform duration-300"
+    // Mobile only — floating pill at bottom-center, matches .ru original exactly
+    <div
+      className="sm:hidden fixed bottom-4 left-1/2 z-50 flex space-x-4 backdrop-blur-lg bg-gray-800/60 p-3 rounded-2xl shadow-2xl transition-transform duration-500"
       style={{
-        paddingBottom: "env(safe-area-inset-bottom)",
-        transform: hidden ? "translateY(100%)" : "translateY(0)",
+        transform: `translateX(-50%) translateY(${hidden ? "5rem" : "0"})`,
       }}
     >
-      <div className="flex items-center justify-around px-2 py-3">
-        {links.map(({ href, icon, label, hover }) => (
-          <a
-            key={label}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex flex-col items-center gap-1 text-gray-400 transition-colors ${hover}`}
-          >
-            <Icon icon={icon} width={22} />
-            <span className="text-[10px] leading-none">{label}</span>
-          </a>
-        ))}
-      </div>
-    </nav>
+      <button
+        onClick={() => window.open(TELEGRAM_URL, "_blank")}
+        className="bg-blue-500 text-white p-1.5 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 hover:bg-blue-400"
+      >
+        <Icon icon="simple-icons:telegram" width={24} height={24} />
+      </button>
+      <button
+        onClick={() => window.open(YOUTUBE_URL, "_blank")}
+        className="bg-red-500 text-white p-1.5 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 hover:bg-red-400"
+      >
+        <Icon icon="simple-icons:youtube" width={24} height={24} />
+      </button>
+      <button
+        onClick={() => window.open(WHATSAPP_URL, "_blank")}
+        className="bg-green-500 text-white p-1.5 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 hover:bg-green-400"
+      >
+        <Icon icon="simple-icons:whatsapp" width={24} height={24} />
+      </button>
+      <button
+        onClick={() => window.open(MAPS_URL, "_blank")}
+        className="bg-yellow-500 text-white p-1.5 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 hover:bg-yellow-400"
+      >
+        <Icon icon="mdi:map-marker" width={24} height={24} />
+      </button>
+    </div>
   );
 }

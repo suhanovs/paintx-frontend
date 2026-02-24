@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import Navbar from "./Navbar";
+import MobileSearchBar from "./MobileSearchBar";
 
 export default function NavbarWrapper() {
   const handleSearch = useCallback((query: string) => {
@@ -10,5 +11,10 @@ export default function NavbarWrapper() {
     );
   }, []);
 
-  return <Navbar onSearch={handleSearch} />;
+  return (
+    <>
+      <Navbar onSearch={handleSearch} />
+      <MobileSearchBar onSearch={handleSearch} />
+    </>
+  );
 }

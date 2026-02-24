@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
@@ -16,24 +16,6 @@ interface NavbarProps {
 
 export default function Navbar({ onSearch }: NavbarProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
-
-  // Hide navbar when scrolling down, reveal when scrolling up
-  useEffect(() => {
-    const onScroll = () => {
-      if (window.innerWidth >= 640) { setHidden(false); return; } // desktop always visible
-      const y = window.scrollY;
-      if (y > lastY.current && y > 80) {
-        setHidden(true);
-      } else {
-        setHidden(false);
-      }
-      lastY.current = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,69 +31,73 @@ export default function Navbar({ onSearch }: NavbarProps) {
     if (onSearch) onSearch("");
   };
 
+  // Desktop only — completely hidden on mobile
   return (
-    <div className="w-full">
-      <nav
-        className="fixed top-0 z-50 w-full bg-black/90 backdrop-blur-md border-b border-gray-800/60 shadow-lg transition-transform duration-300"
-        style={{ transform: hidden ? "translateY(-100%)" : "translateY(0)" }}
-      >
-        <div className="flex items-center h-14 px-4 gap-3 max-w-screen-xl mx-auto">
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            <Image
-              src="/logo.jpg"
-              alt="PaintX"
-              width={110}
-              height={32}
-              className="h-8 w-auto object-contain"
-              priority
-            />
-          </Link>
+    <div className="hidden sm:block w-full">
+      <nav className="fixed top-0 z-50 w-full bg-black shadow-lg border-b border-gray-800 px-4 h-20">
+        <div className="flex items-center justify-between w-full h-full gap-6 max-w-screen-xl mx-auto">
 
-          {/* Search — centered, capped width on desktop */}
-          <div className="flex-1 max-w-md mx-auto relative">
-            <div className="flex items-center bg-white/8 rounded-full px-3 py-1.5 border border-white/10 focus-within:border-white/30 transition-colors">
+          {/* Logo */}
+          <div className="flex items-center px-2 flex-shrink-0">
+            <Link href="/">
+              <Image
+                src="/logo.jpg"
+                alt="PaintX"
+                width={120}
+                height={32}
+                className="h-8 w-auto object-contain"
+                priority
+              />
+            </Link>
+          </div>
+
+          {/* Search bar — flex-grow, centered */}
+          <div className="flex-grow relative">
+            <div className="flex items-center bg-gray-900 rounded-full px-4 py-2.5 border border-gray-700 focus-within:border-gray-500 transition-colors">
               <Icon
                 icon="fluent:search-20-regular"
-                className="text-gray-500 flex-shrink-0 mr-2"
-                width={18}
+                className="text-gray-400 flex-shrink-0 mr-2"
+                width={24}
               />
               <input
                 type="text"
                 placeholder="Search paintings..."
                 value={searchTerm}
                 onChange={handleInputChange}
-                className="bg-transparent text-white placeholder-gray-500 outline-none flex-1 text-sm"
+                className="bg-transparent text-white placeholder-gray-500 outline-none flex-1 text-base"
               />
               {searchTerm && (
-                <button onClick={clearSearch} className="text-gray-500 hover:text-white ml-1.5">
-                  <Icon icon="mdi:close-circle" width={16} />
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                >
+                  <Icon icon="mdi:close-circle" width={20} />
                 </button>
               )}
             </div>
           </div>
 
-          {/* Social buttons — desktop only */}
-          <div className="hidden sm:flex items-center gap-1.5 flex-shrink-0">
+          {/* Contact buttons */}
+          <div className="flex items-center gap-3 px-2 flex-shrink-0">
             {[
-              { url: TELEGRAM_URL,    icon: "simple-icons:telegram",  hover: "hover:bg-blue-600"   },
-              { url: YOUTUBE_URL,     icon: "simple-icons:youtube",    hover: "hover:bg-red-600"    },
-              { url: WHATSAPP_URL,    icon: "simple-icons:whatsapp",   hover: "hover:bg-green-600"  },
-              { url: YANDEX_MAPS_URL, icon: "mdi:map-marker",         hover: "hover:bg-yellow-500" },
+              { url: TELEGRAM_URL,    icon: "simple-icons:telegram", hover: "hover:bg-blue-500"   },
+              { url: YOUTUBE_URL,     icon: "simple-icons:youtube",  hover: "hover:bg-red-500"    },
+              { url: WHATSAPP_URL,    icon: "simple-icons:whatsapp", hover: "hover:bg-green-500"  },
+              { url: YANDEX_MAPS_URL, icon: "mdi:map-marker",       hover: "hover:bg-yellow-500" },
             ].map(({ url, icon, hover }) => (
               <button
                 key={icon}
                 onClick={() => window.open(url, "_blank")}
-                className={`bg-white/8 text-gray-300 p-1.5 rounded-full transition-colors ${hover} hover:text-white`}
+                className={`bg-gray-700 text-white p-2 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 ${hover}`}
               >
-                <Icon icon={icon} width={18} />
+                <Icon icon={icon} width={24} height={24} />
               </button>
             ))}
           </div>
         </div>
       </nav>
-      {/* Spacer matching navbar height */}
-      <div className="h-14" />
+      {/* Spacer */}
+      <div className="h-20" />
     </div>
   );
 }

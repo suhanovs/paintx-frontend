@@ -23,10 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-black text-white antialiased">
-        {/* Extra bottom padding on mobile so content doesn't hide behind the sticky bottom bar */}
-        <div className="pb-16 sm:pb-0">
-          {children}
-        </div>
+        {children}
         <MobileBottomBar />
       </body>
     </html>
