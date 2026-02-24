@@ -16,7 +16,7 @@ const UNKNOWN = ["Unknown style", "Неизвестный стиль", "Unknown"
 const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
   ({ painting }, ref) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isLiked, setIsLiked] = useState(false);
+    const [isLiked, setIsLiked]         = useState(false);
 
     const mid  = midUrl(painting.image_mid_res_filename);
     const full = fullUrl(painting.image_mid_res_filename);
@@ -25,27 +25,29 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
       <>
         <div
           ref={ref}
-          className="relative flex flex-col gap-3 p-4 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors"
+          // bg-gray-900 bg-opacity-20 matches .ru desktop card exactly — nearly transparent on black bg
+          className="relative flex flex-col gap-3 p-4 bg-gray-900 bg-opacity-20 rounded-md transition-all ease-in-out"
+          style={{ borderRadius: "10px", transition: "all 0.3s ease" }}
         >
-          {/* Price badge */}
+          {/* Price badge — left-7 top-7 matches .ru */}
           {painting.export_price && painting.export_price > 0 && (
-            <div className="absolute left-6 top-6 z-20 bg-gray-900/70 backdrop-blur-sm px-2 py-1 rounded-md">
+            <div className="absolute left-7 top-7 z-20 bg-gray-800/60 px-2 py-1 rounded-md">
               <span className="text-white text-xs font-medium">
                 {formatPrice(painting.export_price, "USD")}
               </span>
             </div>
           )}
 
-          {/* Heart / Like button */}
+          {/* Like button — right-7 top-7 matches .ru */}
           <button
             aria-label={isLiked ? "Unlike" : "Like"}
             onClick={(e) => { e.stopPropagation(); setIsLiked((v) => !v); }}
-            className="absolute right-6 top-6 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors"
+            className="absolute right-7 top-7 z-20 flex items-center justify-center w-7 h-7 rounded-full bg-gray-900/50 backdrop-blur-sm hover:bg-gray-900/70 transition-colors"
           >
             <Icon
               icon="solar:heart-bold"
               width={16}
-              className={isLiked ? "text-red-500" : "text-white/60"}
+              className={isLiked ? "text-red-400" : "text-gray-300"}
             />
           </button>
 
@@ -54,54 +56,54 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
           <img
             src={mid}
             alt={painting.title || painting.title_ru || "Painting"}
-            className="w-full aspect-square object-cover rounded-lg cursor-pointer select-none"
+            className="w-full h-full object-cover aspect-square rounded-lg cursor-pointer select-none"
             onClick={() => setIsModalOpen(true)}
             onDoubleClick={() => setIsLiked((v) => !v)}
             onContextMenu={(e) => e.preventDefault()}
             draggable={false}
             loading="lazy"
-            style={{ userSelect: "none", WebkitUserSelect: "none" }}
           />
 
           {/* Info */}
           <div className="flex flex-col gap-2 px-1">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="text-sm font-medium text-gray-100 leading-snug">
+            {/* Title + artist */}
+            <div className="flex items-start justify-between gap-1">
+              <h3 className="text-sm font-medium text-gray-300 leading-snug">
                 {painting.title || painting.title_ru}
               </h3>
               {painting.artist_name && (
-                <p className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">
+                <p className="text-xs font-medium text-gray-300 whitespace-nowrap flex-shrink-0">
                   {painting.artist_name}
                 </p>
               )}
             </div>
 
-            {/* Chips */}
-            <div className="flex flex-wrap gap-1.5">
+            {/* Chips — px-3 py-1 matches .ru */}
+            <div className="flex items-start flex-wrap gap-2 mt-1">
               {painting.style_name && !UNKNOWN.includes(painting.style_name) && (
-                <span className="px-2.5 py-0.5 bg-gray-800 text-white rounded-full text-xs">
+                <span className="inline-flex items-center px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-medium">
                   {painting.style_name}
                 </span>
               )}
               {painting.canvas_width && painting.canvas_height && (
-                <span className="px-2.5 py-0.5 bg-gray-800 text-gray-300 rounded-full text-xs">
+                <span className="inline-flex items-center px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-xs font-medium">
                   {painting.canvas_width}×{painting.canvas_height} cm
                 </span>
               )}
             </div>
 
-            {/* Description — 2 lines, matches .ru desktop card */}
+            {/* Description — line-clamp-2, text-gray-500, matches .ru text-default-500 */}
             {painting.description && (
-              <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">
+              <p className="text-sm text-gray-500 leading-snug line-clamp-2 mt-1">
                 {painting.description}
               </p>
             )}
 
-            {/* Details link */}
-            <div className="mt-1">
+            {/* Details button — bg-gray-800 flat button matches .ru */}
+            <div className="mt-2">
               <Link
                 href={`/art/${painting.id}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Details
                 <Icon icon="mdi:eye-outline" width={16} />
