@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react";
 
 const TELEGRAM_URL = "https://t.me/+79119690469";
@@ -8,18 +9,39 @@ const WHATSAPP_URL = "https://wa.me/79119690469";
 const MAPS_URL     = "https://yandex.ru/maps/org/paintx/49452764850";
 
 const links = [
-  { href: TELEGRAM_URL, icon: "simple-icons:telegram",  label: "Telegram",  hover: "hover:text-blue-400"   },
-  { href: WHATSAPP_URL, icon: "simple-icons:whatsapp",  label: "WhatsApp",  hover: "hover:text-green-400"  },
-  { href: YOUTUBE_URL,  icon: "simple-icons:youtube",   label: "YouTube",   hover: "hover:text-red-400"    },
-  { href: MAPS_URL,     icon: "mdi:map-marker",         label: "Find us",   hover: "hover:text-yellow-400" },
+  { href: TELEGRAM_URL, icon: "simple-icons:telegram", label: "Telegram", hover: "hover:text-blue-400"   },
+  { href: WHATSAPP_URL, icon: "simple-icons:whatsapp", label: "WhatsApp", hover: "hover:text-green-400"  },
+  { href: YOUTUBE_URL,  icon: "simple-icons:youtube",  label: "YouTube",  hover: "hover:text-red-400"    },
+  { href: MAPS_URL,     icon: "mdi:map-marker",        label: "Find us",  hover: "hover:text-yellow-400" },
 ];
 
 export default function MobileBottomBar() {
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      // Hide when scrolling down past 60px; show when scrolling up
+      if (y > lastY.current && y > 60) {
+        setHidden(true);
+      } else {
+        setHidden(false);
+      }
+      lastY.current = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <nav
       aria-label="Contact"
-      className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-black/95 border-t border-gray-800"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-black/95 border-t border-gray-800 transition-transform duration-300"
+      style={{
+        paddingBottom: "env(safe-area-inset-bottom)",
+        transform: hidden ? "translateY(100%)" : "translateY(0)",
+      }}
     >
       <div className="flex items-center justify-around px-2 py-3">
         {links.map(({ href, icon, label, hover }) => (
