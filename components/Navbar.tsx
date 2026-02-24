@@ -22,6 +22,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
   // Hide navbar when scrolling down, reveal when scrolling up
   useEffect(() => {
     const onScroll = () => {
+      if (window.innerWidth >= 640) { setHidden(false); return; } // desktop always visible
       const y = window.scrollY;
       if (y > lastY.current && y > 80) {
         setHidden(true);
