@@ -35,7 +35,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
   return (
     <div className="hidden sm:block w-full">
       <nav className="fixed top-0 z-50 w-full bg-black shadow-lg border-b border-gray-800 px-4 h-20">
-        <div className="flex items-center justify-between w-full h-full gap-6 max-w-screen-xl mx-auto">
+        <div className="flex items-center justify-between w-full h-full gap-6">
 
           {/* Logo — px-6 to match .ru NavbarBrand padding */}
           <div className="flex items-center px-6 flex-shrink-0">

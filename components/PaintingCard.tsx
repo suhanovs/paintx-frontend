@@ -26,7 +26,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
         <div
           ref={ref}
           // bg-gray-900/70 — dark semi-transparent card, visible on black bg without being too heavy
-          className="relative flex flex-col gap-3 p-4 bg-gray-900/70 rounded-md transition-all ease-in-out"
+          className="relative flex flex-col gap-3 p-4 rounded-md transition-all ease-in-out sm:bg-gray-900/20"
           style={{ borderRadius: "10px", transition: "all 0.3s ease" }}
         >
           {/* Price badge — left-7 top-7 matches .ru */}
