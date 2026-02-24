@@ -31,9 +31,13 @@ export interface PaintingDetail {
   year: number | null;
   artist_id: number | null;
   artist_name: string | null;
+  artist_name_en: string | null;
   artist_firstname: string | null;
+  artist_firstname_en: string | null;
   artist_lastname: string | null;
+  artist_lastname_en: string | null;
   artist_about: string | null;
+  artist_about_en: string | null;
   artist_min_price: number | null;
   artist_max_price: number | null;
   artist_works_count: number | null;
@@ -52,6 +56,29 @@ export interface PaintingDetail {
   image_mid_res_filename: string | null;
   image_full_res_filename: string | null;
   framed: boolean | null;
+}
+
+export interface ArtistListItem {
+  artist_id: number;
+  name: string | null;
+  name_en: string | null;
+  firstname: string | null;
+  firstname_en: string | null;
+  lastname: string | null;
+  lastname_en: string | null;
+  works_count: number;
+}
+
+export interface ArtistDetail {
+  artist_id: number;
+  name: string | null;
+  name_en: string | null;
+  firstname: string | null;
+  firstname_en: string | null;
+  lastname: string | null;
+  lastname_en: string | null;
+  about: string | null;
+  about_en: string | null;
 }
 
 export interface RelatedPainting {

@@ -192,15 +192,15 @@ export default async function PaintingDetailPage({
           )}
 
           {/* Artist */}
-          {(p.artist_name as string | null) && (
+          {(p.artist_name_en || p.artist_name) && (
             <div className="border-t border-gray-800 pt-4">
               <p className="text-base font-semibold text-white mb-2">
-                {p.artist_name as string}
+                {(p.artist_name_en || p.artist_name) as string}
               </p>
-              {(p.artist_about as string | null) && (
+              {(p.artist_about_en || p.artist_about) && (
                 <p
                   className="text-sm text-gray-400 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: p.artist_about as string }}
+                  dangerouslySetInnerHTML={{ __html: (p.artist_about_en || p.artist_about) as string }}
                 />
               )}
             </div>
