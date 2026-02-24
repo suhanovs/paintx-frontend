@@ -8,7 +8,7 @@ import { thumbUrl } from "@/lib/api";
 
 interface PaintingScrollerProps {
   title: string;
-  paintingId: string;
+  paintingId: string;   // UUID — used for the API call
   relatedType: "artist" | "style";
 }
 
@@ -73,7 +73,7 @@ export default function PaintingScroller({
             {paintings.map((p) => (
               <Link
                 key={p.id}
-                href={`/art/${p.id}`}
+                href={`/art/${p.slug || p.id}`}
                 className="snap-center flex-none w-36 h-36 overflow-hidden rounded-lg"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}

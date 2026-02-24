@@ -14,6 +14,7 @@ export interface PaintingListItem {
   export_price: number | null;
   scroll_rank: number | null;
   description: string | null;
+  slug: string | null;
 }
 
 export interface ColorItem {
@@ -57,6 +58,7 @@ export interface PaintingDetail {
   image_mid_res_filename: string | null;
   image_full_res_filename: string | null;
   framed: boolean | null;
+  slug: string | null;
 }
 
 export interface ArtistListItem {
@@ -87,6 +89,7 @@ export interface RelatedPainting {
   title: string | null;
   image_thumbnail_filename: string | null;
   artist_name: string | null;
+  slug: string | null;
 }
 
 export interface PaginatedPaintings {

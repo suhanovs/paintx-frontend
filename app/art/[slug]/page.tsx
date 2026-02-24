@@ -1,38 +1,80 @@
 import type { Metadata } from "next";
 import {
-  fetchPaintingDetailServer,
+  fetchPaintingBySlugServer,
   midUrl,
   fullUrl,
   formatPrice,
+  INTERNAL_API_URL,
 } from "@/lib/api";
 import PaintingScroller from "@/components/PaintingScroller";
 import DetailImage from "@/components/DetailImage";
-import Link from "next/link";
 import BackButton from "@/components/BackButton";
 import type { PaintingDetail } from "@/types";
 
 export const revalidate = 3600;
 
+export async function generateStaticParams() {
+  const slugs: string[] = [];
+  try {
+    let page = 1;
+    const limit = 100;
+    while (true) {
+      const res = await fetch(`${INTERNAL_API_URL}/api/paintings?limit=${limit}&page=${page}`, {
+        next: { revalidate: 3600 },
+      });
+      if (!res.ok) break;
+      const data = await res.json();
+      for (const p of (data.items as { slug?: string }[])) {
+        if (p.slug) slugs.push(p.slug);
+      }
+      if (page >= (data.pages ?? 1)) break;
+      page++;
+    }
+  } catch {
+    // return empty — pages will be server-rendered on demand
+  }
+  return slugs.map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
+  const { slug } = await params;
   try {
-    const p: PaintingDetail = await fetchPaintingDetailServer(id);
+    const p: PaintingDetail = await fetchPaintingBySlugServer(slug);
     const mid = midUrl(p.image_mid_res_filename);
+    const canonicalUrl = `https://www.paintx.art/art/${slug}`;
+    const title = p.title || p.title_ru || "Painting";
+    const artist = p.artist_name_en || p.artist_name;
+    const pageTitle = artist ? `${title} by ${artist}` : title;
+    const desc =
+      p.description
+        ? p.description.slice(0, 155)
+        : `Original painting${artist ? ` by ${artist}` : ""}. Browse and purchase fine art at PaintX.`;
+
     return {
-      title: `${p.title || p.title_ru || "Painting"} — PaintX`,
-      description: p.description || p.description_ru || "",
+      title: pageTitle,
+      description: desc,
+      alternates: { canonical: canonicalUrl },
       openGraph: {
-        title: p.title || p.title_ru || "Painting",
-        description: p.description || "",
-        images: mid ? [{ url: mid }] : [],
+        type: "website",
+        url: canonicalUrl,
+        title: pageTitle,
+        description: desc,
+        images: mid ? [{ url: mid, alt: title }] : [],
+        siteName: "PaintX Art Gallery",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: pageTitle,
+        description: desc,
+        images: mid ? [mid] : [],
       },
     };
   } catch {
-    return { title: "Painting — PaintX" };
+    return { title: "Painting" };
   }
 }
 
@@ -41,12 +83,12 @@ const UNKNOWN = ["Unknown", "Неизвестно", "Unknown style", "Неизв
 export default async function PaintingDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { id } = await params;
+  const { slug } = await params;
   let p: PaintingDetail;
   try {
-    p = await fetchPaintingDetailServer(id);
+    p = await fetchPaintingBySlugServer(slug);
   } catch {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black text-white">
@@ -61,6 +103,8 @@ export default async function PaintingDetailPage({
   const title = p.title || p.title_ru || "Untitled";
   const artistName = p.artist_name_en || p.artist_name;
   const artistBio  = p.artist_about_en || p.artist_about;
+  // Keep UUID for related endpoints
+  const paintingId = String(p.id);
 
   return (
     <div className="relative min-h-screen bg-black text-white">
@@ -73,8 +117,8 @@ export default async function PaintingDetailPage({
         {/* Left: Image + related scrollers */}
         <div className="lg:w-3/5">
           <DetailImage mid={mid} full={full} alt={title} />
-          <PaintingScroller title="More by this artist" paintingId={id} relatedType="artist" />
-          <PaintingScroller title="Similar style"       paintingId={id} relatedType="style"  />
+          <PaintingScroller title="More by this artist" paintingId={paintingId} relatedType="artist" />
+          <PaintingScroller title="Similar style"       paintingId={paintingId} relatedType="style"  />
         </div>
 
         {/* Right: Details */}
@@ -127,9 +171,9 @@ export default async function PaintingDetailPage({
           )}
 
           {/* Color swatches */}
-          {p.colors && p.colors.length > 0 && (
+          {p.colors && (p.colors as { hex: string; name: string }[]).length > 0 && (
             <div className="flex gap-2 flex-wrap">
-              {p.colors.map((c, i) => (
+              {(p.colors as { hex: string; name: string }[]).map((c, i) => (
                 <div
                   key={i}
                   className="w-7 h-7 rounded-full border-2 border-gray-700 cursor-default"
@@ -141,9 +185,9 @@ export default async function PaintingDetailPage({
           )}
 
           {/* Tags */}
-          {p.tags && p.tags.length > 0 && (
+          {p.tags && (p.tags as string[]).length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {p.tags
+              {(p.tags as string[])
                 .filter((t) => !UNKNOWN.includes(t))
                 .map((t, i) => (
                   <span key={i} className="px-2.5 py-0.5 bg-gray-800 text-gray-300 rounded-full text-xs">

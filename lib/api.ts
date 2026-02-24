@@ -33,7 +33,7 @@ export function formatPrice(
   }
 }
 
-const INTERNAL_API_URL =
+export const INTERNAL_API_URL =
   process.env.INTERNAL_API_URL || "http://localhost:8000";
 
 export async function fetchPaintingsServer(page: number, search?: string) {
@@ -51,5 +51,13 @@ export async function fetchPaintingDetailServer(id: string) {
     next: { revalidate: 3600 },
   });
   if (!res.ok) throw new Error("Failed to fetch painting detail");
+  return res.json();
+}
+
+export async function fetchPaintingBySlugServer(slug: string) {
+  const res = await fetch(`${INTERNAL_API_URL}/api/paintings/slug/${slug}`, {
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) throw new Error("Failed to fetch painting by slug");
   return res.json();
 }

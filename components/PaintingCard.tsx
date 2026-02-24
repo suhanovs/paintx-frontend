@@ -20,12 +20,13 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
 
     const mid  = midUrl(painting.image_mid_res_filename);
     const full = fullUrl(painting.image_mid_res_filename);
+    // Prefer slug for SEO-friendly URLs; fall back to UUID for unpublished/edge cases
+    const href = `/art/${painting.slug || painting.id}`;
 
     return (
       <>
         <div
           ref={ref}
-          // bg-gray-900/70 — dark semi-transparent card, visible on black bg without being too heavy
           className="relative flex flex-col gap-3 p-4 rounded-md transition-all ease-in-out sm:bg-gray-900/20"
           style={{ borderRadius: "10px", transition: "all 0.3s ease" }}
         >
@@ -78,7 +79,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               )}
             </div>
 
-            {/* Chips — px-3 py-1 matches .ru */}
+            {/* Chips */}
             <div className="flex items-start flex-wrap gap-2 mt-1">
               {painting.style_name && !UNKNOWN.includes(painting.style_name) && (
                 <span className="inline-flex items-center px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-medium">
@@ -92,17 +93,17 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               )}
             </div>
 
-            {/* Description — line-clamp-2, text-gray-500, matches .ru text-default-500 */}
+            {/* Description */}
             {painting.description && (
               <p className="text-sm text-gray-500 leading-snug line-clamp-2 mt-1">
                 {painting.description}
               </p>
             )}
 
-            {/* Details button — bg-gray-800 flat button matches .ru */}
+            {/* Details button */}
             <div className="mt-2">
               <Link
-                href={`/art/${painting.id}`}
+                href={href}
                 onClick={() => sessionStorage.setItem("galleryScrollPos", window.scrollY.toString())}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
               >
