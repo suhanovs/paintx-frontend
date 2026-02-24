@@ -93,7 +93,10 @@ export default function PaintingGallery({
 
   return (
     <div className="relative min-h-screen">
-      <div className="w-full p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* px-2 on mobile = 8px edge gap (close to screen edge, matches .ru)
+          p-4 on sm+ = standard desktop padding
+          gap-3 on mobile = tighter card spacing, gap-6 on sm+ */}
+      <div className="w-full px-2 py-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
         {paintings.map((painting, index) => {
           const isLast = index === paintings.length - 1;
           return (

@@ -51,9 +51,10 @@ export default function Navbar({ onSearch }: NavbarProps) {
             </Link>
           </div>
 
-          {/* Search — flex-grow, no max-w cap, matches .ru NavbarItem flex-grow */}
-          <div className="flex-grow relative">
-            <div className="flex items-center bg-gray-900 rounded-full px-4 py-2.5 border border-gray-700 focus-within:border-gray-500 transition-colors">
+          {/* Search — flex-grow capped at max-w-sm (~384px) to match .ru NavbarItem width.
+              bg-gray-800 + no border = NextUI dark-theme Input default appearance. */}
+          <div className="flex-grow max-w-sm relative">
+            <div className="flex items-center bg-gray-800 rounded-full px-4 py-2.5 transition-colors">
               <Icon
                 icon="fluent:search-20-regular"
                 className="text-gray-400 flex-shrink-0 mr-3"
