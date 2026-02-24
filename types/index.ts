@@ -13,6 +13,7 @@ export interface PaintingListItem {
   image_mid_res_filename: string | null;
   export_price: number | null;
   scroll_rank: number | null;
+  description: string | null;
 }
 
 export interface ColorItem {
