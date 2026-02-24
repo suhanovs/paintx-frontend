@@ -27,13 +27,10 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
           className="relative flex flex-col gap-3 p-4 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors"
         >
           {/* Price badge */}
-          {painting.domestic_price && painting.domestic_price > 0 && (
+          {painting.export_price && painting.export_price > 0 && (
             <div className="absolute left-6 top-6 z-20 bg-gray-900/70 backdrop-blur-sm px-2 py-1 rounded-md">
               <span className="text-white text-xs font-medium">
-                {formatPrice(
-                  painting.domestic_price,
-                  painting.domestic_currency === "RUR" ? "RUB" : "USD"
-                )}
+                {formatPrice(painting.export_price, "USD")}
               </span>
             </div>
           )}

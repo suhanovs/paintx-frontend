@@ -11,6 +11,7 @@ export interface PaintingListItem {
   canvas_width: number | null;
   image_thumbnail_filename: string | null;
   image_mid_res_filename: string | null;
+  export_price: number | null;
   scroll_rank: number | null;
 }
 

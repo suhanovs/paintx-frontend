@@ -70,12 +70,7 @@ export default async function PaintingDetailPage({
     (p.image_full_res_filename as string | null) ||
       (p.image_mid_res_filename as string | null)
   );
-  const exportPrice = p.export_price as number | null;
-  const domesticPrice = p.domestic_price as number | null;
-  const price = formatPrice(
-    exportPrice && exportPrice > 0 ? exportPrice : domesticPrice,
-    exportPrice && exportPrice > 0 ? "USD" : "RUB"
-  );
+  const price = formatPrice(p.export_price as number | null, "USD");
 
   const title = (p.title || p.title_ru || "Untitled") as string;
   const year = p.year as number | null;
