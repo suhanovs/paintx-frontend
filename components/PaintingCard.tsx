@@ -103,6 +103,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
             <div className="mt-2">
               <Link
                 href={`/art/${painting.id}`}
+                onClick={() => sessionStorage.setItem("galleryScrollPos", window.scrollY.toString())}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Details

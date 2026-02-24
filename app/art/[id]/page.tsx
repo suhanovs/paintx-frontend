@@ -8,6 +8,7 @@ import {
 import PaintingScroller from "@/components/PaintingScroller";
 import DetailImage from "@/components/DetailImage";
 import Link from "next/link";
+import BackButton from "@/components/BackButton";
 import type { PaintingDetail } from "@/types";
 
 export const revalidate = 3600;
@@ -62,16 +63,11 @@ export default async function PaintingDetailPage({
   const artistBio  = p.artist_about_en || p.artist_about;
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Back nav */}
-      <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-sm border-b border-gray-800 px-4 py-3">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
-        >
-          ← Back to gallery
-        </Link>
-      </header>
+    <div className="relative min-h-screen bg-black text-white">
+      {/* Floating back button */}
+      <div className="absolute top-4 left-4 z-50">
+        <BackButton />
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-8 p-6 lg:p-10 max-w-7xl mx-auto">
         {/* Left: Image + related scrollers */}

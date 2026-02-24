@@ -38,6 +38,15 @@ export default function PaintingGallery({
     return () => window.removeEventListener("paintx:search", handler);
   }, []);
 
+  // Restore scroll position when returning from a detail page
+  useEffect(() => {
+    const saved = sessionStorage.getItem("galleryScrollPos");
+    if (saved) {
+      sessionStorage.removeItem("galleryScrollPos");
+      window.scrollTo({ top: parseInt(saved, 10), behavior: "instant" });
+    }
+  }, []);
+
   const fetchMore = useCallback(
     async (nextPage: number, searchQuery: string, append: boolean) => {
       if (isFetching.current) return;
