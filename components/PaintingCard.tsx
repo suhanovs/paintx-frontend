@@ -16,7 +16,8 @@ const UNKNOWN = ["Unknown style", "Неизвестный стиль", "Unknown"
 const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
   ({ painting }, ref) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isLiked, setIsLiked]         = useState(false);
+    const [isLiked, setIsLiked] = useState(false);
+    const [likesCount, setLikesCount] = useState<number>(painting.likes_count ?? 0);
 
     const mid  = midUrl(painting.image_mid_res_filename);
     const full = fullUrl(painting.image_mid_res_filename);
@@ -41,15 +42,28 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
 
           {/* Like button — right-7 top-7 matches .ru */}
           <button
-            aria-label={isLiked ? "Unlike" : "Like"}
-            onClick={(e) => { e.stopPropagation(); setIsLiked((v) => !v); }}
-            className="absolute right-7 top-7 z-20 flex items-center justify-center w-7 h-7 rounded-full bg-gray-900/50 backdrop-blur-sm hover:bg-gray-900/70 transition-colors"
+            aria-label={isLiked ? "Liked" : "Like"}
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (isLiked) return;
+              try {
+                const res = await fetch(`/api/paintings/${painting.id}/like`, { method: "POST" });
+                if (!res.ok) return;
+                const data = await res.json();
+                setIsLiked(Boolean(data?.liked) || isLiked);
+                if (typeof data?.likes_count === "number") setLikesCount(data.likes_count);
+              } catch {
+                // no-op
+              }
+            }}
+            className="absolute right-7 top-7 z-20 flex items-center justify-center min-w-7 h-7 px-1 rounded-full bg-gray-900/50 backdrop-blur-sm hover:bg-gray-900/70 transition-colors gap-1"
           >
             <Icon
               icon="solar:heart-bold"
               width={16}
               className={isLiked ? "text-red-400" : "text-gray-300"}
             />
+            <span className="text-[10px] text-gray-200">{likesCount}</span>
           </button>
 
           {/* Image */}
