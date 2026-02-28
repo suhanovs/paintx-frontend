@@ -53,10 +53,9 @@ export default function Navbar({ onSearch }: NavbarProps) {
   return (
     <div className="hidden sm:block w-full">
       <nav className="fixed top-0 z-50 w-full bg-black shadow-lg border-b border-gray-800 px-4 h-20">
-        {/* 3-column grid: logo left | search centered | buttons right */}
-        <div className="grid grid-cols-[auto_1fr_auto] items-center w-full h-full">
-          {/* Logo */}
-          <div className="flex items-center px-6">
+        <div className="relative w-full h-full flex items-center justify-between">
+          {/* Logo (desktop first to hide when narrowing) */}
+          <div className="flex items-center px-6 max-[1180px]:hidden">
             <Link href="/">
               <Image
                 src="/logo.jpg"
@@ -69,9 +68,9 @@ export default function Navbar({ onSearch }: NavbarProps) {
             </Link>
           </div>
 
-          {/* Filters + Search — centered in the middle column */}
-          <div className="flex justify-center px-4">
-            <div className="w-full max-w-4xl flex items-center gap-2">
+          {/* Filters + Search — truly centered in viewport */}
+          <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none">
+            <div className="pointer-events-auto w-full max-w-4xl flex items-center gap-2">
               <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap">
                 {([
                   ["available", "Available"],
@@ -124,7 +123,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                 })}
               </div>
 
-              <div className="flex-1 max-w-xs relative">
+              <div className="flex-1 max-w-xs relative max-[1320px]:hidden">
                 <div className="flex h-11 items-center bg-zinc-800 rounded-full px-4 transition-colors gap-3">
                   <Icon
                     icon="fluent:search-20-regular"

@@ -94,7 +94,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                       emit(query, value, sort);
                     }}
                     className={`rounded-full px-2 py-1 transition-colors ${
-                      active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
+                      active ? "bg-red-500/25 text-red-200" : "text-gray-300"
                     }`}
                     aria-pressed={active}
                   >
@@ -119,7 +119,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                       emit(query, status, value);
                     }}
                     className={`rounded-full px-2 py-1 transition-colors ${
-                      active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
+                      active ? "bg-red-500/25 text-red-200" : "text-gray-300"
                     }`}
                     aria-pressed={active}
                   >
