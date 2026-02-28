@@ -55,7 +55,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
       <nav className="fixed top-0 z-50 w-full bg-black shadow-lg border-b border-gray-800 px-4 h-20">
         <div className="relative w-full h-full flex items-center justify-between">
           {/* Logo (desktop first to hide when narrowing) */}
-          <div className="flex items-center px-6 max-[1180px]:hidden">
+          <div className="hidden lg:flex items-center px-6">
             <Link href="/">
               <Image
                 src="/logo.jpg"
@@ -123,7 +123,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                 })}
               </div>
 
-              <div className="flex-1 max-w-xs relative max-[1320px]:hidden">
+              <div className="hidden xl:block flex-1 max-w-xs relative">
                 <div className="flex h-11 items-center bg-zinc-800 rounded-full px-4 transition-colors gap-3">
                   <Icon
                     icon="fluent:search-20-regular"
