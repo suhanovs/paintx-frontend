@@ -21,6 +21,18 @@ export default function ContactInquiryPanel({ open, onClose }: Props) {
     }
   }, [open]);
 
+  const ensureVisitorCookie = () => {
+    const name = "paintx_vid=";
+    const existing = document.cookie
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith(name));
+    if (existing) return decodeURIComponent(existing.substring(name.length));
+    const id = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`).toString();
+    document.cookie = `paintx_vid=${encodeURIComponent(id)}; Path=/; Max-Age=315360000; SameSite=Lax; Secure`;
+    return id;
+  };
+
   if (!open) return null;
 
   const submit = async () => {
