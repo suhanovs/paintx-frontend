@@ -32,12 +32,6 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
   };
 
   const toggle = () => {
-    if (isOpen) {
-      setQuery("");
-      setStatus("available");
-      setSort("newest");
-      emit("", "available", "newest");
-    }
     setIsOpen((v) => !v);
   };
 
@@ -60,10 +54,20 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
       ) : (
         <div className="w-[calc(100vw-2rem)] max-w-md">
           <div className="backdrop-blur-lg bg-gray-800/60 shadow-md rounded-2xl px-4 py-3 space-y-2">
-            <div className="flex items-center">
+            <div className="flex justify-center pb-1">
+              <button
+                onClick={toggle}
+                className="w-10 h-1.5 rounded-full bg-gray-500/70 hover:bg-gray-400/80 transition-colors"
+                aria-label="Collapse search panel"
+                title="Collapse"
+              />
+            </div>
+
+            <div className="flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 px-3 gap-2">
+              <Icon icon="fluent:search-20-regular" className="text-gray-400 flex-shrink-0" width={20} />
               <input
                 type="text"
-                placeholder="Search paintings, artist, style..."
+                placeholder="Description, artist, style..."
                 value={query}
                 onChange={(e) => {
                   const v = e.target.value;
@@ -71,13 +75,20 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                   emit(v, status, sort);
                 }}
                 autoFocus
-                className="flex-grow bg-transparent text-white outline-none placeholder-gray-400 text-[16px]"
+                className="flex-grow bg-transparent text-white outline-none placeholder-gray-400 focus:placeholder-transparent text-[16px]"
               />
-              <button onClick={toggle} className="ml-2 text-gray-400 hover:text-white flex-shrink-0">
-                <Icon icon="mdi:close" width={24} height={24} />
+              <button
+                onClick={() => {
+                  setQuery("");
+                  emit("", status, sort);
+                }}
+                className={`text-gray-400 hover:text-white transition-opacity ${query ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                aria-label="Clear search"
+              >
+                <Icon icon="mdi:close-circle" width={20} height={20} />
               </button>
             </div>
-            <div className="inline-flex items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-xs w-fit">
+            <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm w-fit">
               {([
                 ["available", "Available"],
                 ["sold", "Sold"],
@@ -93,7 +104,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                       setStatus(value);
                       emit(query, value, sort);
                     }}
-                    className={`rounded-full px-2 py-1 transition-colors ${
+                    className={`rounded-full px-3 py-2 transition-colors ${
                       active ? "bg-red-500/25 text-red-200" : "text-gray-300"
                     }`}
                     aria-pressed={active}
@@ -104,7 +115,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
               })}
             </div>
 
-            <div className="inline-flex items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-xs w-fit">
+            <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm w-fit">
               {([
                 ["newest", "Newest first"],
                 ["oldest", "Oldest first"],
@@ -118,7 +129,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                       setSort(value);
                       emit(query, status, value);
                     }}
-                    className={`rounded-full px-2 py-1 transition-colors ${
+                    className={`rounded-full px-3 py-2 transition-colors ${
                       active ? "bg-red-500/25 text-red-200" : "text-gray-300"
                     }`}
                     aria-pressed={active}
