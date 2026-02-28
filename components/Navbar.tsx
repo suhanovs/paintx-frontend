@@ -69,7 +69,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
           </div>
 
           {/* Filters + Search — truly centered in viewport */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none max-[1260px]:hidden">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none max-[999px]:hidden">
             <div className="pointer-events-auto w-full max-w-4xl flex items-center gap-2">
               <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap max-[1120px]:hidden">
                 {([
@@ -123,7 +123,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                 })}
               </div>
 
-              <div className="hidden xl:block w-[26.5rem] relative">
+              <div className="block max-[1199px]:hidden w-[16rem] relative">
                 <div className="flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 px-4 transition-colors gap-3">
                   <Icon
                     icon="fluent:search-20-regular"
