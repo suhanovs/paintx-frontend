@@ -72,7 +72,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
           {/* Filters + Search — centered in the middle column */}
           <div className="flex justify-center px-4">
             <div className="w-full max-w-4xl flex items-center gap-2">
-              <div className="inline-flex items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-xs whitespace-nowrap">
+              <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap">
                 {([
                   ["available", "Available"],
                   ["sold", "Sold"],
@@ -88,7 +88,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                         setStatus(value);
                         emitSearch(searchTerm, value, sort);
                       }}
-                      className={`rounded-full px-2.5 py-1 transition-colors ${
+                      className={`rounded-full px-3 py-2 transition-colors ${
                         active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
                       }`}
                       aria-pressed={active}
@@ -99,7 +99,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                 })}
               </div>
 
-              <div className="inline-flex items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-xs whitespace-nowrap">
+              <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap">
                 {([
                   ["newest", "Newest first"],
                   ["oldest", "Oldest first"],
@@ -113,7 +113,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                         setSort(value);
                         emitSearch(searchTerm, status, value);
                       }}
-                      className={`rounded-full px-2.5 py-1 transition-colors ${
+                      className={`rounded-full px-3 py-2 transition-colors ${
                         active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
                       }`}
                       aria-pressed={active}
@@ -124,8 +124,8 @@ export default function Navbar({ onSearch }: NavbarProps) {
                 })}
               </div>
 
-              <div className="flex-1 max-w-md relative">
-                <div className="flex items-center bg-zinc-800 rounded-xl px-4 py-2 transition-colors gap-3">
+              <div className="flex-1 max-w-xs relative">
+                <div className="flex h-11 items-center bg-zinc-800 rounded-xl px-4 transition-colors gap-3">
                   <Icon
                     icon="fluent:search-20-regular"
                     className="text-gray-400 flex-shrink-0"
@@ -136,7 +136,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                     placeholder="Search paintings, artist, style..."
                     value={searchTerm}
                     onChange={handleInputChange}
-                    className="bg-transparent text-white placeholder-gray-500 outline-none flex-1 text-base"
+                    className="bg-transparent text-white placeholder-gray-500 outline-none flex-1 text-sm"
                   />
                   {searchTerm && (
                     <button
