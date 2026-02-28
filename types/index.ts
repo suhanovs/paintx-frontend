@@ -12,6 +12,7 @@ export interface PaintingListItem {
   image_thumbnail_filename: string | null;
   image_mid_res_filename: string | null;
   export_price: number | null;
+  likes_count: number | null;
   scroll_rank: number | null;
   description: string | null;
   slug: string | null;
@@ -52,6 +53,7 @@ export interface PaintingDetail {
   domestic_price: number | null;
   domestic_currency: string | null;
   export_price: number | null;
+  likes_count: number | null;
   colors: ColorItem[] | null;
   tags: string[] | null;
   image_thumbnail_filename: string | null;
