@@ -16,6 +16,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
   const [sort, setSort] = useState<SortOrder>("newest");
   const prevY = useRef(0);
   const prevDir = useRef<"up" | "down">("up");
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -33,6 +34,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
   };
 
   const toggle = () => {
+    if (isOpen) inputRef.current?.blur();
     setIsOpen((v) => !v);
   };
 
@@ -45,11 +47,17 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
 
   const hidden = scrollDir === "down";
 
+  useEffect(() => {
+    if (hidden && isOpen) {
+      inputRef.current?.blur();
+    }
+  }, [hidden, isOpen]);
+
   return (
     <div
       className="sm:hidden fixed top-4 left-1/2 z-50 transition-transform duration-500"
       style={{
-        transform: `translateX(-50%) translateY(${hidden ? "-5rem" : "0"})`,
+        transform: `translateX(-50%) translateY(${hidden ? (isOpen ? "-120%" : "-5rem") : "0"})`,
       }}
     >
       {!isOpen ? (
@@ -65,6 +73,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
             <div className="flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 px-3 gap-2">
               <Icon icon="fluent:search-20-regular" className="text-gray-400 flex-shrink-0" width={20} />
               <input
+                ref={inputRef}
                 type="text"
                 placeholder="Description, artist, style..."
                 value={query}
