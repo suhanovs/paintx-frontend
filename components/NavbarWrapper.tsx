@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Navbar, { type SearchState } from "./Navbar";
 import MobileSearchBar from "./MobileSearchBar";
 
-const DEBOUNCE_MS = 350;
+const DEBOUNCE_MS = 700;
 
 export default function NavbarWrapper() {
   const [pending, setPending] = useState<SearchState>({ query: "", soldOnly: false });
