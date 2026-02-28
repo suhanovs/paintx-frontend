@@ -63,9 +63,9 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
       {!isOpen ? (
         <button
           onClick={toggle}
-          className="bg-gray-800/60 text-white p-3 rounded-full shadow-md flex items-center justify-center backdrop-blur-lg transition-transform transform hover:scale-110"
+          className="bg-gray-800/60 text-white w-10 h-10 rounded-2xl shadow-md flex items-center justify-center backdrop-blur-lg transition-transform transform hover:scale-110"
         >
-          <Icon icon="mdi:magnify" width={28} height={28} />
+          <Icon icon="mdi:magnify" width={22} height={22} />
         </button>
       ) : (
         <div className="w-[calc(100vw-2rem)] max-w-md">

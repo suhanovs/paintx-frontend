@@ -11,31 +11,31 @@ const ICONS: Record<ContactIconKey, ContactIconDef> = {
   telegram: {
     key: "telegram",
     icon: "simple-icons:telegram",
-    buttonClass: "bg-blue-500 hover:bg-blue-400",
+    buttonClass: "hover:bg-blue-500",
     url: "https://t.me/+79119690469",
   },
   youtube: {
     key: "youtube",
     icon: "simple-icons:youtube",
-    buttonClass: "bg-red-500 hover:bg-red-400",
+    buttonClass: "hover:bg-red-500",
     url: "https://youtu.be/tHY3NkSewy8",
   },
   whatsapp: {
     key: "whatsapp",
     icon: "simple-icons:whatsapp",
-    buttonClass: "bg-green-500 hover:bg-green-400",
+    buttonClass: "hover:bg-green-500",
     url: "https://wa.me/79119690469",
   },
   maps: {
     key: "maps",
     icon: "mdi:map-marker",
-    buttonClass: "bg-yellow-500 hover:bg-yellow-400",
+    buttonClass: "hover:bg-yellow-500",
     url: "https://yandex.ru/maps/org/paintx/49452764850",
   },
   email: {
     key: "email",
     icon: "mdi:email-outline",
-    buttonClass: "bg-red-500 hover:bg-red-400",
+    buttonClass: "hover:bg-red-500",
   },
 };
 

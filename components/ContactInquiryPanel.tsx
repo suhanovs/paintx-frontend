@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   open: boolean;
@@ -14,6 +14,13 @@ export default function ContactInquiryPanel({ open, onClose }: Props) {
   const [ok, setOk] = useState(false);
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
+  useEffect(() => {
+    if (!open) {
+      setBusy(false);
+      setOk(false);
+    }
+  }, [open]);
+
   if (!open) return null;
 
   const submit = async () => {
@@ -22,17 +29,14 @@ export default function ContactInquiryPanel({ open, onClose }: Props) {
     try {
       const res = await fetch("/api/contact/inquiry", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-visitor-cookie": ensureVisitorCookie(),
+        },
         body: JSON.stringify({ email, comment }),
       });
       if (!res.ok) throw new Error("submit failed");
       setOk(true);
-      setTimeout(() => {
-        onClose();
-        setEmail("");
-        setComment("");
-        setOk(false);
-      }, 700);
     } finally {
       setBusy(false);
     }

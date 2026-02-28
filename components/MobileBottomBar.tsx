@@ -25,8 +25,20 @@ export default function MobileBottomBar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const hidden = scrollDir === "down";
+  const hidden = scrollDir === "down" && !contactOpen;
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+  const ensureVisitorCookie = () => {
+    const name = "paintx_vid=";
+    const existing = document.cookie
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith(name));
+    if (existing) return decodeURIComponent(existing.substring(name.length));
+    const id = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`).toString();
+    document.cookie = `paintx_vid=${encodeURIComponent(id)}; Path=/; Max-Age=315360000; SameSite=Lax; Secure`;
+    return id;
+  };
 
   const submit = async () => {
     setBusy(true);
@@ -34,17 +46,14 @@ export default function MobileBottomBar() {
     try {
       const res = await fetch("/api/contact/inquiry", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-visitor-cookie": ensureVisitorCookie(),
+        },
         body: JSON.stringify({ email, comment }),
       });
       if (!res.ok) throw new Error("submit failed");
       setOk(true);
-      setTimeout(() => {
-        setContactOpen(false);
-        setEmail("");
-        setComment("");
-        setOk(false);
-      }, 700);
     } finally {
       setBusy(false);
     }
@@ -118,7 +127,7 @@ export default function MobileBottomBar() {
           <button
             key={key}
             onClick={() => (key === "email" ? setContactOpen(true) : url && window.open(url, "_blank"))}
-            className={`text-white w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 ${buttonClass}`}
+            className={`bg-gray-700 text-white w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 ${buttonClass}`}
           >
             <Icon icon={icon} width={22} height={22} />
           </button>
