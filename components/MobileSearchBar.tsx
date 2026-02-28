@@ -15,6 +15,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
   const [status, setStatus] = useState<SearchStatus>("available");
   const [sort, setSort] = useState<SortOrder>("newest");
   const prevY = useRef(0);
+  const prevDir = useRef<"up" | "down">("up");
 
   useEffect(() => {
     const onScroll = () => {
@@ -35,13 +36,14 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
     setIsOpen((v) => !v);
   };
 
-  const hidden = scrollDir === "down";
-
   useEffect(() => {
-    if (isOpen && scrollDir === "down") {
+    if (isOpen && prevDir.current === "down" && scrollDir === "up") {
       setIsOpen(false);
     }
-  }, [isOpen, scrollDir]);
+    prevDir.current = scrollDir;
+  }, [scrollDir, isOpen]);
+
+  const hidden = scrollDir === "down";
 
   return (
     <div
