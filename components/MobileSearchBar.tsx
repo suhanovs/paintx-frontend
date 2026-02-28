@@ -37,6 +37,12 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
 
   const hidden = scrollDir === "down";
 
+  useEffect(() => {
+    if (isOpen && scrollDir === "down") {
+      setIsOpen(false);
+    }
+  }, [isOpen, scrollDir]);
+
   return (
     <div
       className="sm:hidden fixed top-4 left-1/2 z-50 transition-transform duration-500"
@@ -54,15 +60,6 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
       ) : (
         <div className="w-[calc(100vw-2rem)] max-w-md">
           <div className="backdrop-blur-lg bg-gray-800/60 shadow-md rounded-2xl px-4 py-3 space-y-2">
-            <div className="flex justify-center pb-1">
-              <button
-                onClick={toggle}
-                className="w-10 h-1.5 rounded-full bg-gray-500/70 hover:bg-gray-400/80 transition-colors"
-                aria-label="Collapse search panel"
-                title="Collapse"
-              />
-            </div>
-
             <div className="flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 px-3 gap-2">
               <Icon icon="fluent:search-20-regular" className="text-gray-400 flex-shrink-0" width={20} />
               <input
@@ -138,6 +135,15 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                   </button>
                 );
               })}
+            </div>
+
+            <div className="flex justify-center pt-1">
+              <button
+                onClick={toggle}
+                className="w-10 h-1.5 rounded-full bg-gray-500/70 hover:bg-gray-400/80 transition-colors"
+                aria-label="Collapse search panel"
+                title="Collapse"
+              />
             </div>
           </div>
         </div>
