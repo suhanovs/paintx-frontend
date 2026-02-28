@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
   const search = request.nextUrl.search;
   const rawCookie = request.headers.get("cookie") || "";
   const visitorCookie =
+    request.headers.get("x-visitor-cookie") ||
     request.cookies.get("paintx_vid")?.value ||
     decodeURIComponent((rawCookie.match(/(?:^|;\s*)paintx_vid=([^;]+)/)?.[1] ?? ""));
   const res = await fetch(`${API}/api/paintings${search}`, {

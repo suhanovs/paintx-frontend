@@ -24,6 +24,14 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
       if (initiallyLiked) setIsLiked(true);
     }, [initiallyLiked]);
 
+    const getVisitorCookie = () => {
+      const match = document.cookie
+        .split(";")
+        .map((c) => c.trim())
+        .find((c) => c.startsWith("paintx_vid="));
+      return match ? decodeURIComponent(match.substring("paintx_vid=".length)) : "";
+    };
+
     const mid  = midUrl(painting.image_mid_res_filename);
     const full = fullUrl(painting.image_mid_res_filename);
     // Prefer slug for SEO-friendly URLs; fall back to UUID for unpublished/edge cases
@@ -52,7 +60,10 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               e.stopPropagation();
               if (isLiked) return;
               try {
-                const res = await fetch(`/api/paintings/${painting.id}/like`, { method: "POST" });
+                const res = await fetch(`/api/paintings/${painting.id}/like`, {
+                  method: "POST",
+                  headers: { "x-visitor-cookie": getVisitorCookie() },
+                });
                 if (!res.ok) return;
                 const data = await res.json();
                 setIsLiked(Boolean(data?.liked) || isLiked);
@@ -128,6 +139,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
                   void fetch(`/api/paintings/${painting.id}/details-click`, {
                     method: "POST",
                     keepalive: true,
+                    headers: { "x-visitor-cookie": getVisitorCookie() },
                   }).catch(() => undefined);
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"

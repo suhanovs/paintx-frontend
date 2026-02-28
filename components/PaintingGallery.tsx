@@ -39,24 +39,24 @@ export default function PaintingGallery({
     return () => window.removeEventListener("paintx:search", handler);
   }, []);
 
+  const getVisitorCookie = () => {
+    const name = "paintx_vid=";
+    const existing = document.cookie
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith(name));
+    if (existing) return decodeURIComponent(existing.substring(name.length));
+
+    const id = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`)
+      .toString()
+      .replace(/\s+/g, "");
+    document.cookie = `paintx_vid=${encodeURIComponent(id)}; Path=/; Max-Age=315360000; SameSite=Lax; Secure`;
+    return id;
+  };
+
   useEffect(() => {
-    const ensureVisitorCookie = () => {
-      const name = "paintx_vid=";
-      const existing = document.cookie
-        .split(";")
-        .map((c) => c.trim())
-        .find((c) => c.startsWith(name));
-      if (existing) return existing.substring(name.length);
-
-      const id = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`)
-        .toString()
-        .replace(/\s+/g, "");
-      document.cookie = `paintx_vid=${id}; Path=/; Max-Age=315360000; SameSite=Lax; Secure`;
-      return id;
-    };
-
-    ensureVisitorCookie();
-    fetch("/api/visitor/likes")
+    const visitorCookie = getVisitorCookie();
+    fetch("/api/visitor/likes", { headers: { "x-visitor-cookie": visitorCookie } })
       .then((r) => (r.ok ? r.json() : { liked_painting_ids: [] }))
       .then((data) => {
         const ids = Array.isArray(data?.liked_painting_ids) ? data.liked_painting_ids : [];
@@ -113,7 +113,9 @@ export default function PaintingGallery({
       if (state.query) params.set("search", state.query);
       params.set("status", state.status);
 
-      const res = await fetch(`/api/paintings?${params}`);
+      const res = await fetch(`/api/paintings?${params}`, {
+        headers: { "x-visitor-cookie": getVisitorCookie() },
+      });
       if (!res.ok) throw new Error("fetch failed");
       const data = await res.json();
       setPaintings((prev) => (append ? [...prev, ...data.items] : data.items));
