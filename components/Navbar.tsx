@@ -154,7 +154,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
               <button
                 key={key}
                 onClick={() => (key === "email" ? setContactOpen(true) : url && window.open(url, "_blank"))}
-                className={`text-white p-2 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 ${buttonClass}`}
+                className={`text-white w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 ${buttonClass}`}
               >
                 <Icon icon={icon} width={24} height={24} />
               </button>

@@ -5,14 +5,14 @@ import { useState } from "react";
 interface Props {
   open: boolean;
   onClose: () => void;
-  mobile?: boolean;
 }
 
-export default function ContactInquiryPanel({ open, onClose, mobile = false }: Props) {
+export default function ContactInquiryPanel({ open, onClose }: Props) {
   const [email, setEmail] = useState("");
   const [comment, setComment] = useState("");
   const [busy, setBusy] = useState(false);
   const [ok, setOk] = useState(false);
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
   if (!open) return null;
 
@@ -41,11 +41,7 @@ export default function ContactInquiryPanel({ open, onClose, mobile = false }: P
   return (
     <div className="fixed inset-0 z-[70] bg-black/50" onClick={onClose}>
       <div
-        className={
-          mobile
-            ? "absolute bottom-0 left-0 right-0 rounded-t-2xl bg-gray-900 border-t border-gray-700 p-4"
-            : "absolute left-1/2 top-1/2 w-[min(92vw,520px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-gray-900 border border-gray-700 p-5"
-        }
+        className="absolute left-1/2 top-1/2 w-[min(92vw,520px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-gray-900 border border-gray-700 p-5"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-white text-lg font-semibold">Contact the gallery</h3>
@@ -76,7 +72,7 @@ export default function ContactInquiryPanel({ open, onClose, mobile = false }: P
           </button>
           <button
             onClick={submit}
-            disabled={busy || !email || !comment}
+            disabled={busy || !emailValid || !comment.trim()}
             className="h-10 px-4 rounded-full bg-red-500/80 text-white disabled:opacity-40"
           >
             {ok ? "Sent" : busy ? "Sending..." : "Send"}
