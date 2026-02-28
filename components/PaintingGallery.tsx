@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import type { PaintingListItem } from "@/types";
 import PaintingCard from "./PaintingCard";
+import type { SearchState } from "./Navbar";
 
 interface PaintingGalleryProps {
   initialPaintings: PaintingListItem[];
@@ -19,16 +20,15 @@ export default function PaintingGallery({
   const [page, setPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialPage < totalPages);
-  const [search, setSearch] = useState("");
+  const [searchState, setSearchState] = useState<SearchState>({ query: "", soldOnly: false });
   const isFetching = useRef(false);
   const observer = useRef<IntersectionObserver | null>(null);
   const lastCardRef = useRef<HTMLDivElement | null>(null);
 
-  // Listen for search events from Navbar
   useEffect(() => {
     const handler = (e: Event) => {
-      const query = (e as CustomEvent<string>).detail;
-      setSearch(query);
+      const detail = (e as CustomEvent<SearchState>).detail;
+      setSearchState(detail);
       setPage(1);
       setPaintings([]);
       setHasMore(true);
@@ -38,18 +38,17 @@ export default function PaintingGallery({
     return () => window.removeEventListener("paintx:search", handler);
   }, []);
 
-  // Continuously mirror gallery state to sessionStorage so "back" can restore it
   useEffect(() => {
     if (paintings.length === 0) return;
     try {
       sessionStorage.setItem("galleryPaintings", JSON.stringify(paintings));
       sessionStorage.setItem("galleryPage", String(page));
       sessionStorage.setItem("galleryHasMore", String(hasMore));
-      sessionStorage.setItem("gallerySearch", search);
-    } catch {} // ignore QuotaExceededError
-  }, [paintings, page, hasMore, search]);
+      sessionStorage.setItem("gallerySearch", searchState.query);
+      sessionStorage.setItem("gallerySoldOnly", String(searchState.soldOnly));
+    } catch {}
+  }, [paintings, page, hasMore, searchState]);
 
-  // Restore paintings + scroll when returning from a detail page
   useEffect(() => {
     const savedScroll = sessionStorage.getItem("galleryScrollPos");
     if (!savedScroll) return;
@@ -58,58 +57,55 @@ export default function PaintingGallery({
     if (raw) {
       try {
         const restoredPaintings: PaintingListItem[] = JSON.parse(raw);
-        const restoredPage   = parseInt(sessionStorage.getItem("galleryPage") ?? "1", 10);
+        const restoredPage = parseInt(sessionStorage.getItem("galleryPage") ?? "1", 10);
         const restoredHasMore = sessionStorage.getItem("galleryHasMore") !== "false";
-        const restoredSearch  = sessionStorage.getItem("gallerySearch") ?? "";
+        const restoredSearch = sessionStorage.getItem("gallerySearch") ?? "";
+        const restoredSoldOnly = sessionStorage.getItem("gallerySoldOnly") === "true";
         setPaintings(restoredPaintings);
         setPage(restoredPage);
         setHasMore(restoredHasMore);
-        setSearch(restoredSearch);
+        setSearchState({ query: restoredSearch, soldOnly: restoredSoldOnly });
         isFetching.current = false;
       } catch {}
     }
 
     const scrollPos = parseInt(savedScroll, 10);
     sessionStorage.removeItem("galleryScrollPos");
-    // Delay scroll until React has painted the restored list
     setTimeout(() => window.scrollTo({ top: scrollPos, behavior: "instant" }), 150);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
-  const fetchMore = useCallback(
-    async (nextPage: number, searchQuery: string, append: boolean) => {
-      if (isFetching.current) return;
-      isFetching.current = true;
-      setIsLoading(true);
-      try {
-        const params = new URLSearchParams({
-          page: String(nextPage),
-          limit: "12",
-        });
-        if (searchQuery) params.set("search", searchQuery);
-        const res = await fetch(`/api/paintings?${params}`);
-        if (!res.ok) throw new Error("fetch failed");
-        const data = await res.json();
-        setPaintings((prev) => (append ? [...prev, ...data.items] : data.items));
-        setPage(nextPage);
-        setHasMore(nextPage < data.pages);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        isFetching.current = false;
-        setIsLoading(false);
-      }
-    },
-    []
-  );
+  const fetchMore = useCallback(async (nextPage: number, state: SearchState, append: boolean) => {
+    if (isFetching.current) return;
+    isFetching.current = true;
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: String(nextPage),
+        limit: "12",
+      });
+      if (state.query) params.set("search", state.query);
+      if (state.soldOnly) params.set("sold_only", "true");
 
-  // When paintings are cleared by a new search, fetch page 1
+      const res = await fetch(`/api/paintings?${params}`);
+      if (!res.ok) throw new Error("fetch failed");
+      const data = await res.json();
+      setPaintings((prev) => (append ? [...prev, ...data.items] : data.items));
+      setPage(nextPage);
+      setHasMore(nextPage < data.pages);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      isFetching.current = false;
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (paintings.length === 0 && hasMore && !isFetching.current) {
-      fetchMore(1, search, false);
+      fetchMore(1, searchState, false);
     }
-  }, [search, paintings.length, hasMore, fetchMore]);
+  }, [searchState, paintings.length, hasMore, fetchMore]);
 
-  // Set up intersection observer on last card
   const setLastCardRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (observer.current) observer.current.disconnect();
@@ -118,31 +114,22 @@ export default function PaintingGallery({
       observer.current = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting && !isFetching.current && hasMore) {
-            fetchMore(page + 1, search, true);
+            fetchMore(page + 1, searchState, true);
           }
         },
-        { rootMargin: "200px" }
+        { rootMargin: "200px" },
       );
       observer.current.observe(node);
     },
-    [hasMore, page, search, fetchMore]
+    [hasMore, page, searchState, fetchMore],
   );
 
   return (
     <div className="relative min-h-screen">
-      {/* px-2 on mobile = 8px edge gap (close to screen edge, matches .ru)
-          p-4 on sm+ = standard desktop padding
-          gap-3 on mobile = tighter card spacing, gap-6 on sm+ */}
       <div className="w-full px-2 py-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
         {paintings.map((painting, index) => {
           const isLast = index === paintings.length - 1;
-          return (
-            <PaintingCard
-              key={painting.id}
-              painting={painting}
-              ref={isLast ? setLastCardRef : null}
-            />
-          );
+          return <PaintingCard key={painting.id} painting={painting} ref={isLast ? setLastCardRef : null} />;
         })}
       </div>
 
@@ -153,9 +140,7 @@ export default function PaintingGallery({
       )}
 
       {!hasMore && paintings.length > 0 && (
-        <p className="text-center text-gray-500 py-8 text-sm">
-          All {paintings.length} paintings loaded
-        </p>
+        <p className="text-center text-gray-500 py-8 text-sm">All {paintings.length} paintings loaded</p>
       )}
     </div>
   );

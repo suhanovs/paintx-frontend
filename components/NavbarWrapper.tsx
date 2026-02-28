@@ -1,14 +1,12 @@
 "use client";
 
 import { useCallback } from "react";
-import Navbar from "./Navbar";
+import Navbar, { type SearchState } from "./Navbar";
 import MobileSearchBar from "./MobileSearchBar";
 
 export default function NavbarWrapper() {
-  const handleSearch = useCallback((query: string) => {
-    window.dispatchEvent(
-      new CustomEvent("paintx:search", { detail: query })
-    );
+  const handleSearch = useCallback((state: SearchState) => {
+    window.dispatchEvent(new CustomEvent("paintx:search", { detail: state }));
   }, []);
 
   return (
