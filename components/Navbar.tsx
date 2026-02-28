@@ -89,7 +89,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                         emitSearch(searchTerm, value, sort);
                       }}
                       className={`rounded-full px-3 py-2 transition-colors ${
-                        active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
+                        active ? "bg-red-500/25 text-red-200" : "text-gray-300"
                       }`}
                       aria-pressed={active}
                     >
@@ -114,7 +114,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                         emitSearch(searchTerm, status, value);
                       }}
                       className={`rounded-full px-3 py-2 transition-colors ${
-                        active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
+                        active ? "bg-red-500/25 text-red-200" : "text-gray-300"
                       }`}
                       aria-pressed={active}
                     >
@@ -125,7 +125,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
               </div>
 
               <div className="flex-1 max-w-xs relative">
-                <div className="flex h-11 items-center bg-zinc-800 rounded-xl px-4 transition-colors gap-3">
+                <div className="flex h-11 items-center bg-zinc-800 rounded-full px-4 transition-colors gap-3">
                   <Icon
                     icon="fluent:search-20-regular"
                     className="text-gray-400 flex-shrink-0"
