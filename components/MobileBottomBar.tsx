@@ -2,15 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react";
-
-const TELEGRAM_URL = "https://t.me/+79119690469";
-const YOUTUBE_URL  = "https://youtu.be/tHY3NkSewy8";
-const WHATSAPP_URL = "https://wa.me/79119690469";
-const MAPS_URL     = "https://yandex.ru/maps/org/paintx/49452764850";
+import { getEnabledContactIcons } from "@/lib/contactIcons";
+import ContactInquiryPanel from "./ContactInquiryPanel";
 
 export default function MobileBottomBar() {
   const [scrollDir, setScrollDir] = useState<"up" | "down">("up");
+  const [contactOpen, setContactOpen] = useState(false);
   const prevY = useRef(0);
+  const contactIcons = getEnabledContactIcons();
 
   useEffect(() => {
     const onScroll = () => {
@@ -33,30 +32,16 @@ export default function MobileBottomBar() {
         transform: `translateX(-50%) translateY(${hidden ? "5rem" : "0"})`,
       }}
     >
-      <button
-        onClick={() => window.open(TELEGRAM_URL, "_blank")}
-        className="bg-blue-500 text-white p-1.5 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 hover:bg-blue-400"
-      >
-        <Icon icon="simple-icons:telegram" width={24} height={24} />
-      </button>
-      <button
-        onClick={() => window.open(YOUTUBE_URL, "_blank")}
-        className="bg-red-500 text-white p-1.5 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 hover:bg-red-400"
-      >
-        <Icon icon="simple-icons:youtube" width={24} height={24} />
-      </button>
-      <button
-        onClick={() => window.open(WHATSAPP_URL, "_blank")}
-        className="bg-green-500 text-white p-1.5 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 hover:bg-green-400"
-      >
-        <Icon icon="simple-icons:whatsapp" width={24} height={24} />
-      </button>
-      <button
-        onClick={() => window.open(MAPS_URL, "_blank")}
-        className="bg-yellow-500 text-white p-1.5 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 hover:bg-yellow-400"
-      >
-        <Icon icon="mdi:map-marker" width={24} height={24} />
-      </button>
+      {contactIcons.map(({ key, icon, url, buttonClass }) => (
+        <button
+          key={key}
+          onClick={() => (key === "email" ? setContactOpen(true) : url && window.open(url, "_blank"))}
+          className={`text-white p-1.5 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 ${buttonClass}`}
+        >
+          <Icon icon={icon} width={24} height={24} />
+        </button>
+      ))}
+      <ContactInquiryPanel open={contactOpen} onClose={() => setContactOpen(false)} mobile />
     </div>
   );
 }

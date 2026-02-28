@@ -4,11 +4,8 @@ import React, { useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
-
-const TELEGRAM_URL = "https://t.me/+79119690469";
-const YOUTUBE_URL = "https://youtu.be/tHY3NkSewy8";
-const WHATSAPP_URL = "https://wa.me/79119690469";
-const YANDEX_MAPS_URL = "https://yandex.ru/maps/org/paintx/49452764850";
+import { getEnabledContactIcons } from "@/lib/contactIcons";
+import ContactInquiryPanel from "./ContactInquiryPanel";
 
 export type SearchStatus = "available" | "sold" | "all" | "liked";
 export type SortOrder = "newest" | "oldest";
@@ -27,6 +24,8 @@ export default function Navbar({ onSearch }: NavbarProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState<SearchStatus>("available");
   const [sort, setSort] = useState<SortOrder>("newest");
+  const [contactOpen, setContactOpen] = useState(false);
+  const contactIcons = getEnabledContactIcons();
 
   const emitSearch = useCallback(
     (query: string, nextStatus: SearchStatus, nextSort: SortOrder) => {
@@ -151,32 +150,11 @@ export default function Navbar({ onSearch }: NavbarProps) {
 
           {/* Contact buttons */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3 flex-shrink-0">
-            {[
-              {
-                url: TELEGRAM_URL,
-                icon: "simple-icons:telegram",
-                hover: "hover:bg-blue-500",
-              },
-              {
-                url: YOUTUBE_URL,
-                icon: "simple-icons:youtube",
-                hover: "hover:bg-red-500",
-              },
-              {
-                url: WHATSAPP_URL,
-                icon: "simple-icons:whatsapp",
-                hover: "hover:bg-green-500",
-              },
-              {
-                url: YANDEX_MAPS_URL,
-                icon: "mdi:map-marker",
-                hover: "hover:bg-yellow-500",
-              },
-            ].map(({ url, icon, hover }) => (
+            {contactIcons.map(({ key, icon, url, buttonClass }) => (
               <button
-                key={icon}
-                onClick={() => window.open(url, "_blank")}
-                className={`bg-gray-700 text-white p-2 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 ${hover}`}
+                key={key}
+                onClick={() => (key === "email" ? setContactOpen(true) : url && window.open(url, "_blank"))}
+                className={`text-white p-2 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 ${buttonClass}`}
               >
                 <Icon icon={icon} width={24} height={24} />
               </button>
@@ -185,6 +163,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
         </div>
       </nav>
       <div className="h-20" />
+      <ContactInquiryPanel open={contactOpen} onClose={() => setContactOpen(false)} />
     </div>
   );
 }
