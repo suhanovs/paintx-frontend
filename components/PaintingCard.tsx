@@ -46,8 +46,8 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
         >
           {/* Price badge — left-7 top-7 matches .ru */}
           {painting.export_price && painting.export_price > 0 && (
-            <div className="absolute left-7 top-7 z-20 bg-gray-800/60 px-2 py-1 rounded-md">
-              <span className="text-white text-xs font-medium">
+            <div className="absolute left-7 top-7 z-20 inline-flex h-7 items-center rounded-md bg-gray-800/60 px-2">
+              <span className="text-xs font-medium leading-none text-white">
                 {formatPrice(painting.export_price, "USD")}
               </span>
             </div>
@@ -79,7 +79,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               width={16}
               className={isLiked ? "text-red-400" : "text-gray-300"}
             />
-            <span className="text-[10px] text-gray-200">{likesCount}</span>
+            {likesCount > 0 && <span className="text-[10px] text-gray-200">{likesCount}</span>}
           </button>
 
           {/* Image */}
