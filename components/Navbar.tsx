@@ -11,10 +11,12 @@ const WHATSAPP_URL = "https://wa.me/79119690469";
 const YANDEX_MAPS_URL = "https://yandex.ru/maps/org/paintx/49452764850";
 
 export type SearchStatus = "available" | "sold" | "all" | "liked";
+export type SortOrder = "newest" | "oldest";
 
 export interface SearchState {
   query: string;
   status: SearchStatus;
+  sort: SortOrder;
 }
 
 interface NavbarProps {
@@ -24,10 +26,11 @@ interface NavbarProps {
 export default function Navbar({ onSearch }: NavbarProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState<SearchStatus>("available");
+  const [sort, setSort] = useState<SortOrder>("newest");
 
   const emitSearch = useCallback(
-    (query: string, nextStatus: SearchStatus) => {
-      if (onSearch) onSearch({ query, status: nextStatus });
+    (query: string, nextStatus: SearchStatus, nextSort: SortOrder) => {
+      if (onSearch) onSearch({ query, status: nextStatus, sort: nextSort });
     },
     [onSearch],
   );
@@ -36,14 +39,14 @@ export default function Navbar({ onSearch }: NavbarProps) {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const query = e.target.value;
       setSearchTerm(query);
-      emitSearch(query, status);
+      emitSearch(query, status, sort);
     },
-    [emitSearch, status],
+    [emitSearch, status, sort],
   );
 
   const clearSearch = () => {
     setSearchTerm("");
-    emitSearch("", status);
+    emitSearch("", status, sort);
   };
 
   // Desktop only — mobile has floating search icon + bottom pill
@@ -66,57 +69,85 @@ export default function Navbar({ onSearch }: NavbarProps) {
             </Link>
           </div>
 
-          {/* Search — centered in the middle column */}
+          {/* Filters + Search — centered in the middle column */}
           <div className="flex justify-center px-4">
-            <div className="w-full max-w-xl relative">
-              <div className="flex items-center bg-zinc-800 rounded-xl px-4 py-2 transition-colors gap-3">
-                <Icon
-                  icon="fluent:search-20-regular"
-                  className="text-gray-400 flex-shrink-0"
-                  width={24}
-                />
-                <input
-                  type="text"
-                  placeholder="Search paintings, artist, style..."
-                  value={searchTerm}
-                  onChange={handleInputChange}
-                  className="bg-transparent text-white placeholder-gray-500 outline-none flex-1 text-base"
-                />
-                <div className="inline-flex items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-xs whitespace-nowrap">
-                  {([
-                    ["available", "Available"],
-                    ["sold", "Sold"],
-                    ["all", "All"],
-                    ["liked", "Liked"],
-                  ] as const).map(([value, label]) => {
-                    const active = status === value;
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => {
-                          setStatus(value);
-                          emitSearch(searchTerm, value);
-                        }}
-                        className={`rounded-full px-2 py-1 transition-colors ${
-                          active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
-                        }`}
-                        aria-pressed={active}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
+            <div className="w-full max-w-4xl flex items-center gap-2">
+              <div className="inline-flex items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-xs whitespace-nowrap">
+                {([
+                  ["available", "Available"],
+                  ["sold", "Sold"],
+                  ["all", "All"],
+                  ["liked", "Liked"],
+                ] as const).map(([value, label]) => {
+                  const active = status === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => {
+                        setStatus(value);
+                        emitSearch(searchTerm, value, sort);
+                      }}
+                      className={`rounded-full px-2.5 py-1 transition-colors ${
+                        active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
+                      }`}
+                      aria-pressed={active}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="inline-flex items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-xs whitespace-nowrap">
+                {([
+                  ["newest", "Newest first"],
+                  ["oldest", "Oldest first"],
+                ] as const).map(([value, label]) => {
+                  const active = sort === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => {
+                        setSort(value);
+                        emitSearch(searchTerm, status, value);
+                      }}
+                      className={`rounded-full px-2.5 py-1 transition-colors ${
+                        active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
+                      }`}
+                      aria-pressed={active}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex-1 max-w-md relative">
+                <div className="flex items-center bg-zinc-800 rounded-xl px-4 py-2 transition-colors gap-3">
+                  <Icon
+                    icon="fluent:search-20-regular"
+                    className="text-gray-400 flex-shrink-0"
+                    width={24}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search paintings, artist, style..."
+                    value={searchTerm}
+                    onChange={handleInputChange}
+                    className="bg-transparent text-white placeholder-gray-500 outline-none flex-1 text-base"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={clearSearch}
+                      className="text-gray-400 hover:text-white"
+                      aria-label="Clear search"
+                    >
+                      <Icon icon="mdi:close-circle" width={20} />
+                    </button>
+                  )}
                 </div>
-                {searchTerm && (
-                  <button
-                    onClick={clearSearch}
-                    className="text-gray-400 hover:text-white"
-                    aria-label="Clear search"
-                  >
-                    <Icon icon="mdi:close-circle" width={20} />
-                  </button>
-                )}
               </div>
             </div>
           </div>

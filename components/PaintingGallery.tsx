@@ -20,7 +20,7 @@ export default function PaintingGallery({
   const [page, setPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialPage < totalPages);
-  const [searchState, setSearchState] = useState<SearchState>({ query: "", status: "available" });
+  const [searchState, setSearchState] = useState<SearchState>({ query: "", status: "available", sort: "newest" });
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const isFetching = useRef(false);
   const observer = useRef<IntersectionObserver | null>(null);
@@ -73,6 +73,7 @@ export default function PaintingGallery({
       sessionStorage.setItem("galleryHasMore", String(hasMore));
       sessionStorage.setItem("gallerySearch", searchState.query);
       sessionStorage.setItem("galleryStatus", searchState.status);
+      sessionStorage.setItem("gallerySort", searchState.sort);
     } catch {}
   }, [paintings, page, hasMore, searchState]);
 
@@ -88,10 +89,11 @@ export default function PaintingGallery({
         const restoredHasMore = sessionStorage.getItem("galleryHasMore") !== "false";
         const restoredSearch = sessionStorage.getItem("gallerySearch") ?? "";
         const restoredStatus = (sessionStorage.getItem("galleryStatus") ?? "available") as SearchState["status"];
+        const restoredSort = (sessionStorage.getItem("gallerySort") ?? "newest") as SearchState["sort"];
         setPaintings(restoredPaintings);
         setPage(restoredPage);
         setHasMore(restoredHasMore);
-        setSearchState({ query: restoredSearch, status: restoredStatus });
+        setSearchState({ query: restoredSearch, status: restoredStatus, sort: restoredSort });
         isFetching.current = false;
       } catch {}
     }
@@ -112,6 +114,7 @@ export default function PaintingGallery({
       });
       if (state.query) params.set("search", state.query);
       params.set("status", state.status);
+      params.set("sort", state.sort);
 
       const res = await fetch(`/api/paintings?${params}`, {
         headers: { "x-visitor-cookie": getVisitorCookie() },

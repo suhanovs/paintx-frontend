@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
-import type { SearchState, SearchStatus } from "./Navbar";
+import type { SearchState, SearchStatus, SortOrder } from "./Navbar";
 
 interface MobileSearchBarProps {
   onSearch?: (state: SearchState) => void;
@@ -13,6 +13,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
   const [scrollDir, setScrollDir] = useState<"up" | "down">("up");
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<SearchStatus>("available");
+  const [sort, setSort] = useState<SortOrder>("newest");
   const prevY = useRef(0);
 
   useEffect(() => {
@@ -26,15 +27,16 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const emit = (nextQuery: string, nextStatus: SearchStatus) => {
-    if (onSearch) onSearch({ query: nextQuery, status: nextStatus });
+  const emit = (nextQuery: string, nextStatus: SearchStatus, nextSort: SortOrder) => {
+    if (onSearch) onSearch({ query: nextQuery, status: nextStatus, sort: nextSort });
   };
 
   const toggle = () => {
     if (isOpen) {
       setQuery("");
       setStatus("available");
-      emit("", "available");
+      setSort("newest");
+      emit("", "available", "newest");
     }
     setIsOpen((v) => !v);
   };
@@ -66,7 +68,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                 onChange={(e) => {
                   const v = e.target.value;
                   setQuery(v);
-                  emit(v, status);
+                  emit(v, status, sort);
                 }}
                 autoFocus
                 className="flex-grow bg-transparent text-white outline-none placeholder-gray-400 text-sm"
@@ -89,7 +91,32 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                     type="button"
                     onClick={() => {
                       setStatus(value);
-                      emit(query, value);
+                      emit(query, value, sort);
+                    }}
+                    className={`rounded-full px-2 py-1 transition-colors ${
+                      active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
+                    }`}
+                    aria-pressed={active}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="inline-flex items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-xs w-fit">
+              {([
+                ["newest", "Newest first"],
+                ["oldest", "Oldest first"],
+              ] as const).map(([value, label]) => {
+                const active = sort === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => {
+                      setSort(value);
+                      emit(query, status, value);
                     }}
                     className={`rounded-full px-2 py-1 transition-colors ${
                       active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
