@@ -49,6 +49,9 @@ export default function ContactInquiryPanel({ open, onClose }: Props) {
       });
       if (!res.ok) throw new Error("submit failed");
       setOk(true);
+      onClose();
+      setEmail("");
+      setComment("");
     } finally {
       setBusy(false);
     }

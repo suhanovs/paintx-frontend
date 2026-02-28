@@ -54,11 +54,16 @@ export default function MobileBottomBar() {
       });
       if (!res.ok) throw new Error("submit failed");
       setOk(true);
+      setContactOpen(false);
+      setEmail("");
+      setComment("");
     } finally {
       setBusy(false);
     }
   };
 
+
+  if (contactIcons.length <= 1) return null;
   return (
     <>
       {contactOpen && (

@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
 import type { SearchState, SearchStatus, SortOrder } from "./Navbar";
+import { getEnabledContactIcons } from "@/lib/contactIcons";
+import ContactInquiryPanel from "./ContactInquiryPanel";
 
 interface MobileSearchBarProps {
   onSearch?: (state: SearchState) => void;
@@ -14,6 +16,8 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<SearchStatus>("available");
   const [sort, setSort] = useState<SortOrder>("newest");
+  const [contactOpen, setContactOpen] = useState(false);
+  const hasEmail = getEnabledContactIcons().some((i) => i.key === "email");
   const prevY = useRef(0);
   const prevDir = useRef<"up" | "down">("up");
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -35,6 +39,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
 
   const toggle = () => {
     if (isOpen) inputRef.current?.blur();
+    if (!isOpen) setContactOpen(false);
     setIsOpen((v) => !v);
   };
 
@@ -61,12 +66,25 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
       }}
     >
       {!isOpen ? (
-        <button
-          onClick={toggle}
-          className="bg-gray-800/60 text-white w-10 h-10 rounded-2xl shadow-md flex items-center justify-center backdrop-blur-lg transition-transform transform hover:scale-110"
-        >
-          <Icon icon="mdi:magnify" width={22} height={22} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggle}
+            className="bg-gray-800/60 text-white w-10 h-10 rounded-2xl shadow-md flex items-center justify-center backdrop-blur-lg transition-transform transform hover:scale-110"
+          >
+            <Icon icon="mdi:magnify" width={22} height={22} />
+          </button>
+          {hasEmail && (
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                setContactOpen(true);
+              }}
+              className="bg-gray-800/60 text-white w-10 h-10 rounded-2xl shadow-md flex items-center justify-center backdrop-blur-lg transition-transform transform hover:scale-110"
+            >
+              <Icon icon="mdi:email-outline" width={22} height={22} />
+            </button>
+          )}
+        </div>
       ) : (
         <div className="w-[calc(100vw-2rem)] max-w-md">
           <div className="backdrop-blur-lg bg-gray-800/60 shadow-md rounded-2xl px-4 py-3 space-y-2">
@@ -159,6 +177,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
           </div>
         </div>
       )}
+      <ContactInquiryPanel open={contactOpen} onClose={() => setContactOpen(false)} />
     </div>
   );
 }
