@@ -71,7 +71,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
           {/* Filters + Search — truly centered in viewport */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none max-[999px]:hidden">
             <div className="pointer-events-auto w-full max-w-4xl flex items-center gap-2">
-              <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap max-[1120px]:hidden">
+              <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap">
                 {([
                   ["available", "Available"],
                   ["sold", "Sold"],
@@ -98,7 +98,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                 })}
               </div>
 
-              <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap max-[1120px]:hidden">
+              <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap">
                 {([
                   ["newest", "Newest first"],
                   ["oldest", "Oldest first"],
