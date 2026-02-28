@@ -53,9 +53,9 @@ export default function Navbar({ onSearch }: NavbarProps) {
   return (
     <div className="hidden sm:block w-full">
       <nav className="fixed top-0 z-50 w-full bg-black shadow-lg border-b border-gray-800 px-4 h-20">
-        <div className="relative w-full h-full flex items-center justify-between">
+        <div className="relative w-full h-full">
           {/* Logo (desktop first to hide when narrowing) */}
-          <div className="hidden lg:flex items-center px-6">
+          <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex items-center">
             <Link href="/">
               <Image
                 src="/logo.jpg"
@@ -69,9 +69,9 @@ export default function Navbar({ onSearch }: NavbarProps) {
           </div>
 
           {/* Filters + Search — truly centered in viewport */}
-          <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
             <div className="pointer-events-auto w-full max-w-4xl flex items-center gap-2">
-              <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap">
+              <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap max-[1120px]:hidden">
                 {([
                   ["available", "Available"],
                   ["sold", "Sold"],
@@ -98,7 +98,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                 })}
               </div>
 
-              <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap">
+              <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap max-[1120px]:hidden">
                 {([
                   ["newest", "Newest first"],
                   ["oldest", "Oldest first"],
@@ -123,8 +123,8 @@ export default function Navbar({ onSearch }: NavbarProps) {
                 })}
               </div>
 
-              <div className="hidden xl:block flex-1 max-w-xs relative">
-                <div className="flex h-11 items-center bg-zinc-800 rounded-full px-4 transition-colors gap-3">
+              <div className="hidden xl:block flex-1 max-w-[23rem] relative">
+                <div className="flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 px-4 transition-colors gap-3">
                   <Icon
                     icon="fluent:search-20-regular"
                     className="text-gray-400 flex-shrink-0"
@@ -132,10 +132,10 @@ export default function Navbar({ onSearch }: NavbarProps) {
                   />
                   <input
                     type="text"
-                    placeholder="Search paintings, artist, style..."
+                    placeholder="Description, artist, style..."
                     value={searchTerm}
                     onChange={handleInputChange}
-                    className="bg-transparent text-white placeholder-gray-500 outline-none flex-1 text-sm"
+                    className="bg-transparent text-white placeholder-gray-400 outline-none flex-1 text-sm"
                   />
                   {searchTerm && (
                     <button
@@ -152,7 +152,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
           </div>
 
           {/* Contact buttons */}
-          <div className="flex items-center gap-3 px-4 flex-shrink-0">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3 flex-shrink-0">
             {[
               {
                 url: TELEGRAM_URL,
