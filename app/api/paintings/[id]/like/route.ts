@@ -10,7 +10,10 @@ export async function POST(
 
   const xff = request.headers.get("x-forwarded-for") || "";
   const xri = request.headers.get("x-real-ip") || "";
-  const visitorCookie = request.cookies.get("paintx_vid")?.value || "";
+  const rawCookie = request.headers.get("cookie") || "";
+  const visitorCookie =
+    request.cookies.get("paintx_vid")?.value ||
+    decodeURIComponent((rawCookie.match(/(?:^|;\s*)paintx_vid=([^;]+)/)?.[1] ?? ""));
 
   const res = await fetch(`${API}/api/paintings/${id}/like`, {
     method: "POST",
