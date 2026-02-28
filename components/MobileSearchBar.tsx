@@ -75,19 +75,23 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                 <Icon icon="mdi:close" width={24} height={24} />
               </button>
             </div>
-            <label className="flex items-center gap-2 text-xs text-gray-300">
-              <input
-                type="checkbox"
-                checked={soldOnly}
-                onChange={(e) => {
-                  const checked = e.target.checked;
-                  setSoldOnly(checked);
-                  emit(query, checked);
-                }}
-                className="accent-gray-200"
-              />
-              Sold only
-            </label>
+            <button
+              type="button"
+              onClick={() => {
+                const next = !soldOnly;
+                setSoldOnly(next);
+                emit(query, next);
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors ${
+                soldOnly
+                  ? "border-emerald-400/80 bg-emerald-500/20 text-emerald-200"
+                  : "border-gray-600 bg-gray-700/40 text-gray-300"
+              }`}
+              aria-pressed={soldOnly}
+            >
+              <Icon icon={soldOnly ? "mdi:check-circle" : "mdi:circle-outline"} width={14} />
+              Sold
+            </button>
           </div>
         </div>
       )}

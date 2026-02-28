@@ -39,15 +39,6 @@ export default function Navbar({ onSearch }: NavbarProps) {
     [emitSearch, soldOnly],
   );
 
-  const handleSoldToggle = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const checked = e.target.checked;
-      setSoldOnly(checked);
-      emitSearch(searchTerm, checked);
-    },
-    [emitSearch, searchTerm],
-  );
-
   const clearSearch = () => {
     setSearchTerm("");
     emitSearch("", soldOnly);
@@ -89,15 +80,25 @@ export default function Navbar({ onSearch }: NavbarProps) {
                   onChange={handleInputChange}
                   className="bg-transparent text-white placeholder-gray-500 outline-none flex-1 text-base"
                 />
-                <label className="flex items-center gap-1.5 text-xs text-gray-300 whitespace-nowrap">
-                  <input
-                    type="checkbox"
-                    checked={soldOnly}
-                    onChange={handleSoldToggle}
-                    className="accent-gray-200"
-                  />
-                  Sold only
-                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !soldOnly;
+                    setSoldOnly(next);
+                    emitSearch(searchTerm, next);
+                  }}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs whitespace-nowrap transition-colors ${
+                    soldOnly
+                      ? "border-emerald-400/80 bg-emerald-500/20 text-emerald-200"
+                      : "border-gray-600 bg-gray-700/40 text-gray-300"
+                  }`}
+                  aria-pressed={soldOnly}
+                  aria-label="Toggle sold-only filter"
+                  title="Show sold paintings only"
+                >
+                  <Icon icon={soldOnly ? "mdi:check-circle" : "mdi:circle-outline"} width={14} />
+                  Sold
+                </button>
                 {searchTerm && (
                   <button
                     onClick={clearSearch}
