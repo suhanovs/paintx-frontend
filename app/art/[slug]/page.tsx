@@ -11,7 +11,7 @@ import DetailImage from "@/components/DetailImage";
 import BackButton from "@/components/BackButton";
 import type { PaintingDetail } from "@/types";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   const slugs: string[] = [];

@@ -48,7 +48,7 @@ export async function fetchPaintingsServer(page: number, search?: string) {
 
 export async function fetchPaintingDetailServer(id: string) {
   const res = await fetch(`${INTERNAL_API_URL}/api/paintings/${id}`, {
-    next: { revalidate: 3600 },
+    next: { revalidate: 60 },
   });
   if (!res.ok) throw new Error("Failed to fetch painting detail");
   return res.json();
@@ -56,7 +56,7 @@ export async function fetchPaintingDetailServer(id: string) {
 
 export async function fetchPaintingBySlugServer(slug: string) {
   const res = await fetch(`${INTERNAL_API_URL}/api/paintings/slug/${slug}`, {
-    next: { revalidate: 3600 },
+    next: { revalidate: 60 },
   });
   if (!res.ok) throw new Error("Failed to fetch painting by slug");
   return res.json();
