@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import type { PaintingListItem } from "@/types";
@@ -9,15 +9,20 @@ import PaintingModal from "./PaintingModal";
 
 interface PaintingCardProps {
   painting: PaintingListItem;
+  initiallyLiked?: boolean;
 }
 
 const UNKNOWN = ["Unknown style", "Неизвестный стиль", "Unknown", "Неизвестно", ""];
 
 const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
-  ({ painting }, ref) => {
+  ({ painting, initiallyLiked = false }, ref) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isLiked, setIsLiked] = useState(false);
+    const [isLiked, setIsLiked] = useState(initiallyLiked);
     const [likesCount, setLikesCount] = useState<number>(painting.likes_count ?? 0);
+
+    useEffect(() => {
+      if (initiallyLiked) setIsLiked(true);
+    }, [initiallyLiked]);
 
     const mid  = midUrl(painting.image_mid_res_filename);
     const full = fullUrl(painting.image_mid_res_filename);

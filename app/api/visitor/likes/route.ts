@@ -2,22 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 const API = process.env.INTERNAL_API_URL || "http://localhost:8000";
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { id } = await params;
-
-  const xff = request.headers.get("x-forwarded-for") || "";
-  const xri = request.headers.get("x-real-ip") || "";
+export async function GET(request: NextRequest) {
   const visitorCookie = request.cookies.get("paintx_vid")?.value || "";
 
-  const res = await fetch(`${API}/api/paintings/${id}/like`, {
-    method: "POST",
+  const res = await fetch(`${API}/api/visitor/likes`, {
     headers: {
       "Content-Type": "application/json",
-      "x-forwarded-for": xff,
-      "x-real-ip": xri,
       "x-visitor-cookie": visitorCookie,
     },
   });

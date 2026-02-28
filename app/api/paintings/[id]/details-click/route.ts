@@ -10,6 +10,7 @@ export async function POST(
 
   const xff = request.headers.get("x-forwarded-for") || "";
   const xri = request.headers.get("x-real-ip") || "";
+  const visitorCookie = request.cookies.get("paintx_vid")?.value || "";
 
   const res = await fetch(`${API}/api/paintings/${id}/details-click`, {
     method: "POST",
@@ -17,6 +18,7 @@ export async function POST(
       "Content-Type": "application/json",
       "x-forwarded-for": xff,
       "x-real-ip": xri,
+      "x-visitor-cookie": visitorCookie,
     },
   });
 

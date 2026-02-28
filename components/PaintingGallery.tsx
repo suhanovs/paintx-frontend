@@ -21,6 +21,7 @@ export default function PaintingGallery({
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialPage < totalPages);
   const [searchState, setSearchState] = useState<SearchState>({ query: "", status: "available" });
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const isFetching = useRef(false);
   const observer = useRef<IntersectionObserver | null>(null);
   const lastCardRef = useRef<HTMLDivElement | null>(null);
@@ -36,6 +37,32 @@ export default function PaintingGallery({
     };
     window.addEventListener("paintx:search", handler);
     return () => window.removeEventListener("paintx:search", handler);
+  }, []);
+
+  useEffect(() => {
+    const ensureVisitorCookie = () => {
+      const name = "paintx_vid=";
+      const existing = document.cookie
+        .split(";")
+        .map((c) => c.trim())
+        .find((c) => c.startsWith(name));
+      if (existing) return existing.substring(name.length);
+
+      const id = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`)
+        .toString()
+        .replace(/\s+/g, "");
+      document.cookie = `paintx_vid=${id}; Path=/; Max-Age=315360000; SameSite=Lax; Secure`;
+      return id;
+    };
+
+    ensureVisitorCookie();
+    fetch("/api/visitor/likes")
+      .then((r) => (r.ok ? r.json() : { liked_painting_ids: [] }))
+      .then((data) => {
+        const ids = Array.isArray(data?.liked_painting_ids) ? data.liked_painting_ids : [];
+        setLikedIds(new Set(ids));
+      })
+      .catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -129,7 +156,14 @@ export default function PaintingGallery({
       <div className="w-full px-2 py-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
         {paintings.map((painting, index) => {
           const isLast = index === paintings.length - 1;
-          return <PaintingCard key={painting.id} painting={painting} ref={isLast ? setLastCardRef : null} />;
+          return (
+            <PaintingCard
+              key={painting.id}
+              painting={painting}
+              initiallyLiked={likedIds.has(painting.id)}
+              ref={isLast ? setLastCardRef : null}
+            />
+          );
         })}
       </div>
 

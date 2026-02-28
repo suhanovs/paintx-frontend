@@ -80,6 +80,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                 ["available", "Available"],
                 ["sold", "Sold"],
                 ["all", "All"],
+                ["liked", "Liked"],
               ] as const).map(([value, label]) => {
                 const active = status === value;
                 return (

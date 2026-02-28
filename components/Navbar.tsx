@@ -10,7 +10,7 @@ const YOUTUBE_URL = "https://youtu.be/tHY3NkSewy8";
 const WHATSAPP_URL = "https://wa.me/79119690469";
 const YANDEX_MAPS_URL = "https://yandex.ru/maps/org/paintx/49452764850";
 
-export type SearchStatus = "available" | "sold" | "all";
+export type SearchStatus = "available" | "sold" | "all" | "liked";
 
 export interface SearchState {
   query: string;
@@ -87,6 +87,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                     ["available", "Available"],
                     ["sold", "Sold"],
                     ["all", "All"],
+                    ["liked", "Liked"],
                   ] as const).map(([value, label]) => {
                     const active = status === value;
                     return (
