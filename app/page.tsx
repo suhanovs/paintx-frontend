@@ -3,7 +3,7 @@ import { fetchPaintingsServer } from "@/lib/api";
 import PaintingGallery from "@/components/PaintingGallery";
 import NavbarWrapper from "@/components/NavbarWrapper";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Buy Original Paintings — Contemporary & Classical Art | PaintX Art Gallery",

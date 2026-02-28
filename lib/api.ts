@@ -40,7 +40,7 @@ export async function fetchPaintingsServer(page: number, search?: string) {
   const params = new URLSearchParams({ page: String(page), limit: "12" });
   if (search) params.set("search", search);
   const res = await fetch(`${INTERNAL_API_URL}/api/paintings?${params}`, {
-    next: { revalidate: 3600 },
+    next: { revalidate: 60 },
   });
   if (!res.ok) throw new Error("Failed to fetch paintings");
   return res.json();
