@@ -55,7 +55,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
       <nav className="fixed top-0 z-50 w-full bg-black shadow-lg border-b border-gray-800 px-4 h-20">
         <div className="relative w-full h-full">
           {/* Logo (desktop first to hide when narrowing) */}
-          <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex items-center">
+          <div className="absolute left-6 top-1/2 -translate-y-1/2 flex items-center">
             <Link href="/">
               <Image
                 src="/logo.jpg"

@@ -71,7 +71,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                   emit(v, status, sort);
                 }}
                 autoFocus
-                className="flex-grow bg-transparent text-white outline-none placeholder-gray-400 text-sm"
+                className="flex-grow bg-transparent text-white outline-none placeholder-gray-400 text-[16px]"
               />
               <button onClick={toggle} className="ml-2 text-gray-400 hover:text-white flex-shrink-0">
                 <Icon icon="mdi:close" width={24} height={24} />
