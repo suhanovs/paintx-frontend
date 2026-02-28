@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
-import type { SearchState } from "./Navbar";
+import type { SearchState, SearchStatus } from "./Navbar";
 
 interface MobileSearchBarProps {
   onSearch?: (state: SearchState) => void;
@@ -12,7 +12,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrollDir, setScrollDir] = useState<"up" | "down">("up");
   const [query, setQuery] = useState("");
-  const [soldOnly, setSoldOnly] = useState(false);
+  const [status, setStatus] = useState<SearchStatus>("available");
   const prevY = useRef(0);
 
   useEffect(() => {
@@ -26,15 +26,15 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const emit = (nextQuery: string, nextSoldOnly: boolean) => {
-    if (onSearch) onSearch({ query: nextQuery, soldOnly: nextSoldOnly });
+  const emit = (nextQuery: string, nextStatus: SearchStatus) => {
+    if (onSearch) onSearch({ query: nextQuery, status: nextStatus });
   };
 
   const toggle = () => {
     if (isOpen) {
       setQuery("");
-      setSoldOnly(false);
-      emit("", false);
+      setStatus("available");
+      emit("", "available");
     }
     setIsOpen((v) => !v);
   };
@@ -66,7 +66,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                 onChange={(e) => {
                   const v = e.target.value;
                   setQuery(v);
-                  emit(v, soldOnly);
+                  emit(v, status);
                 }}
                 autoFocus
                 className="flex-grow bg-transparent text-white outline-none placeholder-gray-400 text-sm"
@@ -75,23 +75,31 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                 <Icon icon="mdi:close" width={24} height={24} />
               </button>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                const next = !soldOnly;
-                setSoldOnly(next);
-                emit(query, next);
-              }}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors ${
-                soldOnly
-                  ? "border-emerald-400/80 bg-emerald-500/20 text-emerald-200"
-                  : "border-gray-600 bg-gray-700/40 text-gray-300"
-              }`}
-              aria-pressed={soldOnly}
-            >
-              <Icon icon={soldOnly ? "mdi:check-circle" : "mdi:circle-outline"} width={14} />
-              Sold
-            </button>
+            <div className="inline-flex items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-xs w-fit">
+              {([
+                ["available", "Available"],
+                ["sold", "Sold"],
+                ["all", "All"],
+              ] as const).map(([value, label]) => {
+                const active = status === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => {
+                      setStatus(value);
+                      emit(query, value);
+                    }}
+                    className={`rounded-full px-2 py-1 transition-colors ${
+                      active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
+                    }`}
+                    aria-pressed={active}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

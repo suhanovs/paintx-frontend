@@ -7,7 +7,7 @@ import MobileSearchBar from "./MobileSearchBar";
 const DEBOUNCE_MS = 700;
 
 export default function NavbarWrapper() {
-  const [pending, setPending] = useState<SearchState>({ query: "", soldOnly: false });
+  const [pending, setPending] = useState<SearchState>({ query: "", status: "available" });
   const isFirstRender = useRef(true);
 
   const handleSearch = useCallback((state: SearchState) => {

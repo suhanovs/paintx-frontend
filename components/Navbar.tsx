@@ -10,9 +10,11 @@ const YOUTUBE_URL = "https://youtu.be/tHY3NkSewy8";
 const WHATSAPP_URL = "https://wa.me/79119690469";
 const YANDEX_MAPS_URL = "https://yandex.ru/maps/org/paintx/49452764850";
 
+export type SearchStatus = "available" | "sold" | "all";
+
 export interface SearchState {
   query: string;
-  soldOnly: boolean;
+  status: SearchStatus;
 }
 
 interface NavbarProps {
@@ -21,11 +23,11 @@ interface NavbarProps {
 
 export default function Navbar({ onSearch }: NavbarProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [soldOnly, setSoldOnly] = useState(false);
+  const [status, setStatus] = useState<SearchStatus>("available");
 
   const emitSearch = useCallback(
-    (query: string, sold: boolean) => {
-      if (onSearch) onSearch({ query, soldOnly: sold });
+    (query: string, nextStatus: SearchStatus) => {
+      if (onSearch) onSearch({ query, status: nextStatus });
     },
     [onSearch],
   );
@@ -34,14 +36,14 @@ export default function Navbar({ onSearch }: NavbarProps) {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const query = e.target.value;
       setSearchTerm(query);
-      emitSearch(query, soldOnly);
+      emitSearch(query, status);
     },
-    [emitSearch, soldOnly],
+    [emitSearch, status],
   );
 
   const clearSearch = () => {
     setSearchTerm("");
-    emitSearch("", soldOnly);
+    emitSearch("", status);
   };
 
   // Desktop only — mobile has floating search icon + bottom pill
@@ -80,25 +82,31 @@ export default function Navbar({ onSearch }: NavbarProps) {
                   onChange={handleInputChange}
                   className="bg-transparent text-white placeholder-gray-500 outline-none flex-1 text-base"
                 />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = !soldOnly;
-                    setSoldOnly(next);
-                    emitSearch(searchTerm, next);
-                  }}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs whitespace-nowrap transition-colors ${
-                    soldOnly
-                      ? "border-emerald-400/80 bg-emerald-500/20 text-emerald-200"
-                      : "border-gray-600 bg-gray-700/40 text-gray-300"
-                  }`}
-                  aria-pressed={soldOnly}
-                  aria-label="Toggle sold-only filter"
-                  title="Show sold paintings only"
-                >
-                  <Icon icon={soldOnly ? "mdi:check-circle" : "mdi:circle-outline"} width={14} />
-                  Sold
-                </button>
+                <div className="inline-flex items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-xs whitespace-nowrap">
+                  {([
+                    ["available", "Available"],
+                    ["sold", "Sold"],
+                    ["all", "All"],
+                  ] as const).map(([value, label]) => {
+                    const active = status === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => {
+                          setStatus(value);
+                          emitSearch(searchTerm, value);
+                        }}
+                        className={`rounded-full px-2 py-1 transition-colors ${
+                          active ? "bg-emerald-500/25 text-emerald-200" : "text-gray-300"
+                        }`}
+                        aria-pressed={active}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
                 {searchTerm && (
                   <button
                     onClick={clearSearch}

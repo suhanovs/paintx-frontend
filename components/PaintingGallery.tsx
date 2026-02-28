@@ -20,7 +20,7 @@ export default function PaintingGallery({
   const [page, setPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialPage < totalPages);
-  const [searchState, setSearchState] = useState<SearchState>({ query: "", soldOnly: false });
+  const [searchState, setSearchState] = useState<SearchState>({ query: "", status: "available" });
   const isFetching = useRef(false);
   const observer = useRef<IntersectionObserver | null>(null);
   const lastCardRef = useRef<HTMLDivElement | null>(null);
@@ -45,7 +45,7 @@ export default function PaintingGallery({
       sessionStorage.setItem("galleryPage", String(page));
       sessionStorage.setItem("galleryHasMore", String(hasMore));
       sessionStorage.setItem("gallerySearch", searchState.query);
-      sessionStorage.setItem("gallerySoldOnly", String(searchState.soldOnly));
+      sessionStorage.setItem("galleryStatus", searchState.status);
     } catch {}
   }, [paintings, page, hasMore, searchState]);
 
@@ -60,11 +60,11 @@ export default function PaintingGallery({
         const restoredPage = parseInt(sessionStorage.getItem("galleryPage") ?? "1", 10);
         const restoredHasMore = sessionStorage.getItem("galleryHasMore") !== "false";
         const restoredSearch = sessionStorage.getItem("gallerySearch") ?? "";
-        const restoredSoldOnly = sessionStorage.getItem("gallerySoldOnly") === "true";
+        const restoredStatus = (sessionStorage.getItem("galleryStatus") ?? "available") as SearchState["status"];
         setPaintings(restoredPaintings);
         setPage(restoredPage);
         setHasMore(restoredHasMore);
-        setSearchState({ query: restoredSearch, soldOnly: restoredSoldOnly });
+        setSearchState({ query: restoredSearch, status: restoredStatus });
         isFetching.current = false;
       } catch {}
     }
@@ -84,7 +84,7 @@ export default function PaintingGallery({
         limit: "12",
       });
       if (state.query) params.set("search", state.query);
-      if (state.soldOnly) params.set("sold_only", "true");
+      params.set("status", state.status);
 
       const res = await fetch(`/api/paintings?${params}`);
       if (!res.ok) throw new Error("fetch failed");
