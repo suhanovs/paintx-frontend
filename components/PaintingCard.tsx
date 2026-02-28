@@ -118,7 +118,13 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
             <div className="mt-2">
               <Link
                 href={href}
-                onClick={() => sessionStorage.setItem("galleryScrollPos", window.scrollY.toString())}
+                onClick={() => {
+                  sessionStorage.setItem("galleryScrollPos", window.scrollY.toString());
+                  void fetch(`/api/paintings/${painting.id}/details-click`, {
+                    method: "POST",
+                    keepalive: true,
+                  }).catch(() => undefined);
+                }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Details
