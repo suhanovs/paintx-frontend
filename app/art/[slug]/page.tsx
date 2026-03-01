@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   fetchPaintingBySlugServer,
   midUrl,
@@ -12,6 +13,7 @@ import BackButton from "@/components/BackButton";
 import ArtistPriceRange from "@/components/ArtistPriceRange";
 import ArtworkRating from "@/components/ArtworkRating";
 import DetailInquiryCta from "@/components/DetailInquiryCta";
+import { slugifyFacet } from "@/lib/facets";
 import type { PaintingDetail } from "@/types";
 
 export const revalidate = 60;
@@ -164,13 +166,25 @@ export default async function PaintingDetailPage({
           {/* Attribute chips */}
           <div className="flex flex-wrap gap-2">
             {p.style_name && !UNKNOWN.includes(p.style_name) && (
-              <span className={DETAIL_PILL_CLASS}>{p.style_name}</span>
+              <Link href={`/style/${slugifyFacet(p.style_name)}`} className={`${DETAIL_PILL_CLASS} hover:bg-gray-600 transition-colors`}>
+                {p.style_name}
+              </Link>
             )}
             {p.medium_name && !UNKNOWN.includes(p.medium_name) && (
-              <span className={DETAIL_PILL_CLASS}>{p.medium_name}</span>
+              <Link
+                href={`/?${new URLSearchParams({ page: "1", search: `"${p.medium_name}"` }).toString()}`}
+                className={`${DETAIL_PILL_CLASS} hover:bg-gray-600 transition-colors`}
+              >
+                {p.medium_name}
+              </Link>
             )}
             {p.canvas_name && !UNKNOWN.includes(p.canvas_name) && (
-              <span className={DETAIL_PILL_CLASS}>{p.canvas_name}</span>
+              <Link
+                href={`/?${new URLSearchParams({ page: "1", search: `"${p.canvas_name}"` }).toString()}`}
+                className={`${DETAIL_PILL_CLASS} hover:bg-gray-600 transition-colors`}
+              >
+                {p.canvas_name}
+              </Link>
             )}
             {p.canvas_width && p.canvas_height && (
               <span className={DETAIL_PILL_CLASS}>
@@ -212,7 +226,12 @@ export default async function PaintingDetailPage({
           {/* Artist */}
           {artistName && (
             <div className="border-t border-gray-800 pt-4">
-              <p className="text-base font-semibold text-white mb-2">{artistName}</p>
+              <Link
+                href={`/artist/${slugifyFacet(artistName)}`}
+                className={`${DETAIL_PILL_CLASS} inline-flex mb-2 hover:bg-gray-600 transition-colors`}
+              >
+                {artistName}
+              </Link>
               {artistBio && (
                 <p
                   className="text-sm text-gray-400 leading-relaxed"
