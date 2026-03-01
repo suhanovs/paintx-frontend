@@ -123,6 +123,8 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
             <button
               onClick={() => {
                 setSearchOpen(false);
+                setEmail("");
+                setComment("");
                 setContactOpen(true);
               }}
               className="bg-gray-800/60 text-white w-10 h-10 rounded-2xl shadow-md flex items-center justify-center backdrop-blur-lg transition-transform transform hover:scale-110"
@@ -234,7 +236,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
         <div className="w-[calc(100vw-2rem)] max-w-md">
           <div className="backdrop-blur-lg bg-gray-800/60 shadow-md rounded-2xl px-4 py-3 space-y-3 border border-gray-700/60">
             <p className="text-white text-sm font-medium">Contact the gallery</p>
-            <p className="text-gray-400 text-xs">
+            <p className="text-gray-400 text-sm">
               Share your email and note. Tip: like paintings you ask about so we can narrow options quickly.
             </p>
 
@@ -259,6 +261,8 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                 onClick={() => {
                   emailInputRef.current?.blur();
                   setContactOpen(false);
+                  setEmail("");
+                  setComment("");
                 }}
                 className="h-10 px-4 rounded-full border border-gray-600 text-gray-300"
               >
@@ -278,6 +282,8 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                 onClick={() => {
                   emailInputRef.current?.blur();
                   setContactOpen(false);
+                  setEmail("");
+                  setComment("");
                 }}
                 className="w-10 h-1.5 rounded-full bg-gray-500/70 hover:bg-gray-400/80 transition-colors"
                 aria-label="Collapse contact panel"
