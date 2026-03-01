@@ -115,16 +115,16 @@ export default async function PaintingDetailPage({
         <BackButton />
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8 p-6 lg:p-10 max-w-7xl mx-auto">
+      <div className="flex flex-col lg:flex-row gap-5 px-[10px] py-3 w-full">
         {/* Left: Image + related scrollers */}
-        <div className="lg:w-1/2">
+        <div className="lg:w-[65%]">
           <DetailImage mid={mid} full={full} alt={title} />
           <PaintingScroller title="More by this artist" paintingId={paintingId} relatedType="artist" />
           <PaintingScroller title="Similar style"       paintingId={paintingId} relatedType="style"  />
         </div>
 
         {/* Right: Details */}
-        <div className="flex flex-col gap-5 lg:w-1/2">
+        <div className="flex flex-col gap-4 lg:w-[35%]">
           <h1 className="text-3xl font-bold">
             {title}
             {p.year && p.year > 0 ? `, ${p.year}` : ""}

@@ -18,7 +18,7 @@ export default function DetailImage({ mid, full, alt }: DetailImageProps) {
       <img
         src={mid}
         alt={alt}
-        className="w-full h-auto rounded-xl shadow-2xl object-cover cursor-zoom-in select-none"
+        className="w-full h-auto rounded-lg shadow-2xl object-contain cursor-zoom-in select-none"
         onClick={() => setModalOpen(true)}
         onContextMenu={(e) => e.preventDefault()}
         draggable={false}
