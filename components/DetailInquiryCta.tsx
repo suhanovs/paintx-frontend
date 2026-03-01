@@ -20,11 +20,12 @@ export default function DetailInquiryCta({ title, slug }: Props) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="bg-gray-700 text-white w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 hover:bg-red-500"
+          className="inline-flex items-center gap-2 rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm hover:bg-red-500/25 hover:text-red-200"
           aria-label="Contact about this painting"
           title="Contact about this painting"
         >
-          <Icon icon="mdi:email-outline" width={24} height={24} />
+          <Icon icon="mdi:email-outline" width={18} height={18} />
+          Contact
         </button>
       </div>
 

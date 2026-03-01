@@ -20,16 +20,18 @@ export function formatPrice(
   currency = "USD"
 ): string {
   if (!price || price <= 0) return "Price on request";
-  const cur = currency === "RUR" ? "RUB" : currency;
+  const code = (currency || "USD").toUpperCase();
+  const cur = code === "RUR" ? "RUB" : code;
   try {
-    return new Intl.NumberFormat("en-US", {
+    const formatted = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: cur,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
+    return `${formatted} ${code}`;
   } catch {
-    return `${price} ${cur}`;
+    return `${price} ${code}`;
   }
 }
 
