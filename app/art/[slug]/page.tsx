@@ -81,6 +81,7 @@ export async function generateMetadata({
 }
 
 const UNKNOWN = ["Unknown", "Неизвестно", "Unknown style", "Неизвестный стиль", ""];
+const DETAIL_PILL_CLASS = "px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap";
 
 export default async function PaintingDetailPage({
   params,
@@ -115,16 +116,16 @@ export default async function PaintingDetailPage({
         <BackButton />
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-5 px-[10px] py-3 w-full">
+      <div className="flex flex-col lg:flex-row gap-5 pt-20 pb-3 w-full">
         {/* Left: Image + related scrollers */}
-        <div className="lg:w-[65%]">
+        <div className="lg:w-[65%] px-[10px]">
           <DetailImage mid={mid} full={full} alt={title} />
           <PaintingScroller title="More by this artist" paintingId={paintingId} relatedType="artist" />
           <PaintingScroller title="Similar style"       paintingId={paintingId} relatedType="style"  />
         </div>
 
         {/* Right: Details */}
-        <div className="flex flex-col gap-4 lg:w-[35%]">
+        <div className="flex flex-col gap-4 lg:w-[35%] px-[10px]">
           <h1 className="text-3xl font-bold">
             {title}
             {p.year && p.year > 0 ? `, ${p.year}` : ""}
@@ -136,14 +137,10 @@ export default async function PaintingDetailPage({
           {/* Status + condition + one-line range */}
           <div className="flex items-center gap-3 flex-wrap lg:flex-nowrap">
             {p.availability && (
-              <span className="px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap">
-                {p.availability}
-              </span>
+              <span className={DETAIL_PILL_CLASS}>{p.availability}</span>
             )}
             {p.condition && !UNKNOWN.includes(p.condition) && (
-              <span className="px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap">
-                {p.condition}
-              </span>
+              <span className={DETAIL_PILL_CLASS}>{p.condition}</span>
             )}
             <div className="flex-1 min-w-[180px] lg:min-w-[220px]">
               <ArtistPriceRange
@@ -167,29 +164,21 @@ export default async function PaintingDetailPage({
           {/* Attribute chips */}
           <div className="flex flex-wrap gap-2">
             {p.style_name && !UNKNOWN.includes(p.style_name) && (
-              <span className="px-3 py-1 bg-gray-800 text-white rounded-full text-sm">
-                {p.style_name}
-              </span>
+              <span className={DETAIL_PILL_CLASS}>{p.style_name}</span>
             )}
             {p.medium_name && !UNKNOWN.includes(p.medium_name) && (
-              <span className="px-3 py-1 bg-gray-800 text-white rounded-full text-sm">
-                {p.medium_name}
-              </span>
+              <span className={DETAIL_PILL_CLASS}>{p.medium_name}</span>
             )}
             {p.canvas_name && !UNKNOWN.includes(p.canvas_name) && (
-              <span className="px-3 py-1 bg-gray-800 text-white rounded-full text-sm">
-                {p.canvas_name}
-              </span>
+              <span className={DETAIL_PILL_CLASS}>{p.canvas_name}</span>
             )}
             {p.canvas_width && p.canvas_height && (
-              <span className="px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-sm">
+              <span className={DETAIL_PILL_CLASS}>
                 {p.canvas_width} × {p.canvas_height} cm
               </span>
             )}
             {p.framed && (
-              <span className="px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-sm">
-                Framed
-              </span>
+              <span className={DETAIL_PILL_CLASS}>Framed</span>
             )}
           </div>
 
@@ -213,7 +202,7 @@ export default async function PaintingDetailPage({
               {(p.tags as string[])
                 .filter((t) => !UNKNOWN.includes(t))
                 .map((t, i) => (
-                  <span key={i} className="px-2.5 py-0.5 bg-gray-800 text-gray-300 rounded-full text-xs">
+                  <span key={i} className={DETAIL_PILL_CLASS}>
                     {t}
                   </span>
                 ))}
