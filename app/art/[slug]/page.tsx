@@ -9,6 +9,7 @@ import {
 import PaintingScroller from "@/components/PaintingScroller";
 import DetailImage from "@/components/DetailImage";
 import BackButton from "@/components/BackButton";
+import ArtistPriceRange from "@/components/ArtistPriceRange";
 import type { PaintingDetail } from "@/types";
 
 export const revalidate = 60;
@@ -130,6 +131,14 @@ export default async function PaintingDetailPage({
 
           {/* Price */}
           <div className="text-xl font-semibold text-gray-200">{price}</div>
+
+          <ArtistPriceRange
+            min={p.artist_min_price ?? 0}
+            max={p.artist_max_price ?? 0}
+            current={p.export_price ?? 0}
+            count={p.artist_works_count ?? 0}
+            currency="USD"
+          />
 
           {/* Chips */}
           <div className="flex flex-wrap gap-2">
