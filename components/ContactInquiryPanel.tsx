@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 interface Props {
   open: boolean;
   onClose: () => void;
+  initialComment?: string;
+  tipText?: string;
 }
 
-export default function ContactInquiryPanel({ open, onClose }: Props) {
+export default function ContactInquiryPanel({ open, onClose, initialComment = "", tipText }: Props) {
   const [email, setEmail] = useState("");
   const [comment, setComment] = useState("");
   const [busy, setBusy] = useState(false);
@@ -18,8 +20,10 @@ export default function ContactInquiryPanel({ open, onClose }: Props) {
     if (!open) {
       setBusy(false);
       setOk(false);
+      return;
     }
-  }, [open]);
+    if (initialComment) setComment(initialComment);
+  }, [open, initialComment]);
 
   const ensureVisitorCookie = () => {
     const name = "paintx_vid=";
@@ -65,7 +69,7 @@ export default function ContactInquiryPanel({ open, onClose }: Props) {
       >
         <h3 className="text-white text-lg font-semibold">Contact the gallery</h3>
         <p className="text-gray-400 text-sm mt-1">
-          Share your email and a short note. Tip: like paintings you ask about so we can quickly narrow options.
+          {tipText || "Share your email and a short note. Tip: like paintings you ask about so we can quickly narrow options."}
         </p>
 
         <div className="mt-4 space-y-3">

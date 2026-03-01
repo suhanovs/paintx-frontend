@@ -9,6 +9,11 @@ interface RatingItem {
   value?: number;
   reason?: string;
   comment?: string;
+  rarity?: number;
+  complexity?: number;
+  quality?: number;
+  appreciation?: number;
+  description?: string;
 }
 
 export default function ArtworkRating({ notesRu }: { notesRu: string }) {
@@ -17,7 +22,11 @@ export default function ArtworkRating({ notesRu }: { notesRu: string }) {
   const items = useMemo(() => {
     try {
       const parsed = JSON.parse(notesRu);
-      return Array.isArray(parsed) ? (parsed as RatingItem[]) : [];
+      if (Array.isArray(parsed)) return parsed as RatingItem[];
+      if (parsed && typeof parsed === "object" && Array.isArray((parsed as { ratings?: unknown[] }).ratings)) {
+        return (parsed as { ratings: RatingItem[] }).ratings;
+      }
+      return [];
     } catch {
       return [];
     }
@@ -26,14 +35,26 @@ export default function ArtworkRating({ notesRu }: { notesRu: string }) {
   if (!items.length) return null;
 
   const normalized = items.map((it, i) => {
-    const name = it.title || it.criterion || `Criterion ${i + 1}`;
-    const raw = Number(it.score ?? it.value ?? 0);
+    const scoreCandidates = [it.score, it.value, it.rarity, it.complexity, it.quality, it.appreciation]
+      .map((v) => Number(v))
+      .filter((v) => Number.isFinite(v));
+    const raw = scoreCandidates.length ? scoreCandidates[0] : 0;
+
+    const name =
+      it.title ||
+      it.criterion ||
+      (it.rarity != null ? "Rarity" : undefined) ||
+      (it.complexity != null ? "Complexity" : undefined) ||
+      (it.quality != null ? "Quality" : undefined) ||
+      (it.appreciation != null ? "Appreciation" : undefined) ||
+      `Criterion ${i + 1}`;
+
     const score = Math.max(0, Math.min(10, Number.isFinite(raw) ? raw : 0));
     return {
       name,
       score,
       pct: (score / 10) * 100,
-      note: it.reason || it.comment || "",
+      note: it.reason || it.comment || it.description || "",
     };
   });
 

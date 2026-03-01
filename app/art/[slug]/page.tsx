@@ -11,6 +11,7 @@ import DetailImage from "@/components/DetailImage";
 import BackButton from "@/components/BackButton";
 import ArtistPriceRange from "@/components/ArtistPriceRange";
 import ArtworkRating from "@/components/ArtworkRating";
+import DetailInquiryCta from "@/components/DetailInquiryCta";
 import type { PaintingDetail } from "@/types";
 
 export const revalidate = 60;
@@ -221,25 +222,8 @@ export default async function PaintingDetailPage({
             </div>
           )}
 
-          {/* CTA buttons */}
-          <div className="flex flex-wrap gap-3 mt-4">
-            <a
-              href={`https://t.me/+79119690469?text=${encodeURIComponent(`Hello! I'm interested in the painting "${title}". Can you tell me more?`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm transition-colors"
-            >
-              Inquire via Telegram
-            </a>
-            <a
-              href={`https://wa.me/79119690469?text=${encodeURIComponent(`Hello! I'm interested in the painting "${title}". Can you tell me more?`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm transition-colors"
-            >
-              WhatsApp
-            </a>
-          </div>
+          {/* CTA */}
+          <DetailInquiryCta title={title} slug={slug} />
           </div>
         </div>
 
