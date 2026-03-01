@@ -24,6 +24,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
   const [ok, setOk] = useState(false);
 
   const prevY = useRef(0);
+  const prevDir = useRef<"up" | "down">("up");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
   const hasEmail = getEnabledContactIcons().some((i) => i.key === "email");
@@ -51,6 +52,16 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
       emailInputRef.current?.blur();
     }
   }, [hidden]);
+
+  useEffect(() => {
+    if ((searchOpen || contactOpen) && prevDir.current === "down" && scrollDir === "up") {
+      searchInputRef.current?.blur();
+      emailInputRef.current?.blur();
+      setSearchOpen(false);
+      setContactOpen(false);
+    }
+    prevDir.current = scrollDir;
+  }, [scrollDir, searchOpen, contactOpen]);
 
   const ensureVisitorCookie = () => {
     const name = "paintx_vid=";
@@ -92,7 +103,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
     <div
       className="sm:hidden fixed top-4 left-1/2 z-50 transition-transform duration-500"
       style={{
-        transform: `translateX(-50%) translateY(${hidden ? "-5rem" : "0"})`,
+        transform: `translateX(-50%) translateY(${hidden ? (searchOpen || contactOpen ? "-130%" : "-5rem") : "0"})`,
       }}
     >
       {!searchOpen && !contactOpen && (
