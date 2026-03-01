@@ -7,16 +7,17 @@ import { getEnabledContactIcons } from "@/lib/contactIcons";
 
 interface MobileSearchBarProps {
   onSearch?: (state: SearchState) => void;
+  initialState?: SearchState;
 }
 
-export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
+export default function MobileSearchBar({ onSearch, initialState }: MobileSearchBarProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [scrollDir, setScrollDir] = useState<"up" | "down">("up");
 
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<SearchStatus>("available");
-  const [sort, setSort] = useState<SortOrder>("newest");
+  const [query, setQuery] = useState(initialState?.query ?? "");
+  const [status, setStatus] = useState<SearchStatus>(initialState?.status ?? "available");
+  const [sort, setSort] = useState<SortOrder>(initialState?.sort ?? "newest");
 
   const [email, setEmail] = useState("");
   const [comment, setComment] = useState("");
@@ -76,6 +77,13 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
   };
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+  useEffect(() => {
+    if (!initialState) return;
+    setQuery(initialState.query);
+    setStatus(initialState.status);
+    setSort(initialState.sort);
+  }, [initialState]);
 
   const submitContact = async () => {
     setBusy(true);

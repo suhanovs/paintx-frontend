@@ -8,10 +8,32 @@ const DEBOUNCE_MS = 700;
 
 export default function NavbarWrapper() {
   const [pending, setPending] = useState<SearchState>({ query: "", status: "available", sort: "newest" });
+  const [urlState, setUrlState] = useState<SearchState>({ query: "", status: "available", sort: "newest" });
   const isFirstRender = useRef(true);
 
   const handleSearch = useCallback((state: SearchState) => {
     setPending(state);
+  }, []);
+
+  useEffect(() => {
+    const read = () => {
+      const params = new URLSearchParams(window.location.search);
+      const query = params.get("search") ?? "";
+      const statusParam = params.get("status");
+      const sortParam = params.get("sort");
+      const status =
+        statusParam === "sold" || statusParam === "all" || statusParam === "liked"
+          ? statusParam
+          : "available";
+      const sort = sortParam === "oldest" ? "oldest" : "newest";
+      const next = { query, status, sort } as SearchState;
+      setUrlState(next);
+      setPending(next);
+    };
+
+    read();
+    window.addEventListener("popstate", read);
+    return () => window.removeEventListener("popstate", read);
   }, []);
 
   useEffect(() => {
@@ -28,8 +50,8 @@ export default function NavbarWrapper() {
 
   return (
     <>
-      <Navbar onSearch={handleSearch} />
-      <MobileSearchBar onSearch={handleSearch} />
+      <Navbar onSearch={handleSearch} initialState={urlState} />
+      <MobileSearchBar onSearch={handleSearch} initialState={urlState} />
     </>
   );
 }

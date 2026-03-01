@@ -18,12 +18,13 @@ export interface SearchState {
 
 interface NavbarProps {
   onSearch?: (state: SearchState) => void;
+  initialState?: SearchState;
 }
 
-export default function Navbar({ onSearch }: NavbarProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [status, setStatus] = useState<SearchStatus>("available");
-  const [sort, setSort] = useState<SortOrder>("newest");
+export default function Navbar({ onSearch, initialState }: NavbarProps) {
+  const [searchTerm, setSearchTerm] = useState(initialState?.query ?? "");
+  const [status, setStatus] = useState<SearchStatus>(initialState?.status ?? "available");
+  const [sort, setSort] = useState<SortOrder>(initialState?.sort ?? "newest");
   const [contactOpen, setContactOpen] = useState(false);
   const contactIcons = getEnabledContactIcons();
 
@@ -47,6 +48,13 @@ export default function Navbar({ onSearch }: NavbarProps) {
     setSearchTerm("");
     emitSearch("", status, sort);
   };
+
+  React.useEffect(() => {
+    if (!initialState) return;
+    setSearchTerm(initialState.query);
+    setStatus(initialState.status);
+    setSort(initialState.sort);
+  }, [initialState]);
 
   // Desktop only — mobile has floating search icon + bottom pill
   return (
