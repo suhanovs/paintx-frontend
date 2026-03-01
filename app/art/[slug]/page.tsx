@@ -10,6 +10,7 @@ import PaintingScroller from "@/components/PaintingScroller";
 import DetailImage from "@/components/DetailImage";
 import BackButton from "@/components/BackButton";
 import ArtistPriceRange from "@/components/ArtistPriceRange";
+import ArtworkRating from "@/components/ArtworkRating";
 import type { PaintingDetail } from "@/types";
 
 export const revalidate = 60;
@@ -132,6 +133,15 @@ export default async function PaintingDetailPage({
           {/* Price */}
           <div className="text-xl font-semibold text-gray-200">{price}</div>
 
+          {/* Primary status chip */}
+          <div className="flex flex-wrap gap-2">
+            {p.availability && (
+              <span className="px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium">
+                {p.availability}
+              </span>
+            )}
+          </div>
+
           <ArtistPriceRange
             min={p.artist_min_price ?? 0}
             max={p.artist_max_price ?? 0}
@@ -140,13 +150,16 @@ export default async function PaintingDetailPage({
             currency="USD"
           />
 
-          {/* Chips */}
+          {/* Description */}
+          {p.description && (
+            <p className="text-sm text-gray-300 leading-relaxed">{p.description}</p>
+          )}
+
+          {/* Evaluation */}
+          {p.notes_ru && <ArtworkRating notesRu={p.notes_ru} />}
+
+          {/* Attribute chips */}
           <div className="flex flex-wrap gap-2">
-            {p.availability && (
-              <span className="px-3 py-1 bg-gray-800 text-white rounded-full text-sm">
-                {p.availability}
-              </span>
-            )}
             {p.style_name && !UNKNOWN.includes(p.style_name) && (
               <span className="px-3 py-1 bg-gray-800 text-white rounded-full text-sm">
                 {p.style_name}
@@ -173,11 +186,6 @@ export default async function PaintingDetailPage({
               </span>
             )}
           </div>
-
-          {/* Description */}
-          {p.description && (
-            <p className="text-sm text-gray-300 leading-relaxed">{p.description}</p>
-          )}
 
           {/* Color swatches */}
           {p.colors && (p.colors as { hex: string; name: string }[]).length > 0 && (
