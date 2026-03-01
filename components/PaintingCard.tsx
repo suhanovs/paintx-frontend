@@ -103,9 +103,13 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
                 {painting.title || painting.title_ru}
               </h3>
               {painting.artist_name && (
-                <p className="text-xs font-medium text-gray-300 whitespace-nowrap flex-shrink-0">
+                <Link
+                  href={`/?${new URLSearchParams({ page: "1", search: `"${painting.artist_name}"` }).toString()}`}
+                  className="inline-flex items-center px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-medium hover:bg-gray-700 transition-colors whitespace-nowrap flex-shrink-0"
+                  aria-label={`Filter by artist ${painting.artist_name}`}
+                >
                   {painting.artist_name}
-                </p>
+                </Link>
               )}
             </div>
 
