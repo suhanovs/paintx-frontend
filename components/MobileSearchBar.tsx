@@ -4,23 +4,29 @@ import { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
 import type { SearchState, SearchStatus, SortOrder } from "./Navbar";
 import { getEnabledContactIcons } from "@/lib/contactIcons";
-import ContactInquiryPanel from "./ContactInquiryPanel";
 
 interface MobileSearchBarProps {
   onSearch?: (state: SearchState) => void;
 }
 
 export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const [scrollDir, setScrollDir] = useState<"up" | "down">("up");
+
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<SearchStatus>("available");
   const [sort, setSort] = useState<SortOrder>("newest");
-  const [contactOpen, setContactOpen] = useState(false);
-  const hasEmail = getEnabledContactIcons().some((i) => i.key === "email");
+
+  const [email, setEmail] = useState("");
+  const [comment, setComment] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [ok, setOk] = useState(false);
+
   const prevY = useRef(0);
-  const prevDir = useRef<"up" | "down">("up");
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
+  const hasEmail = getEnabledContactIcons().some((i) => i.key === "email");
 
   useEffect(() => {
     const onScroll = () => {
@@ -37,61 +43,93 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
     if (onSearch) onSearch({ query: nextQuery, status: nextStatus, sort: nextSort });
   };
 
-  const toggle = () => {
-    if (isOpen) inputRef.current?.blur();
-    if (!isOpen) setContactOpen(false);
-    setIsOpen((v) => !v);
-  };
-
-  useEffect(() => {
-    if (isOpen && prevDir.current === "down" && scrollDir === "up") {
-      setIsOpen(false);
-    }
-    prevDir.current = scrollDir;
-  }, [scrollDir, isOpen]);
-
   const hidden = scrollDir === "down";
 
   useEffect(() => {
-    if (hidden && isOpen) {
-      inputRef.current?.blur();
+    if (hidden) {
+      searchInputRef.current?.blur();
+      emailInputRef.current?.blur();
     }
-  }, [hidden, isOpen]);
+  }, [hidden]);
+
+  const ensureVisitorCookie = () => {
+    const name = "paintx_vid=";
+    const existing = document.cookie
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith(name));
+    if (existing) return decodeURIComponent(existing.substring(name.length));
+    const id = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`).toString();
+    document.cookie = `paintx_vid=${encodeURIComponent(id)}; Path=/; Max-Age=315360000; SameSite=Lax; Secure`;
+    return id;
+  };
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+  const submitContact = async () => {
+    setBusy(true);
+    setOk(false);
+    try {
+      const res = await fetch("/api/contact/inquiry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-visitor-cookie": ensureVisitorCookie(),
+        },
+        body: JSON.stringify({ email, comment }),
+      });
+      if (!res.ok) throw new Error("submit failed");
+      setOk(true);
+      setContactOpen(false);
+      setEmail("");
+      setComment("");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div
       className="sm:hidden fixed top-4 left-1/2 z-50 transition-transform duration-500"
       style={{
-        transform: `translateX(-50%) translateY(${hidden ? (isOpen ? "-120%" : "-5rem") : "0"})`,
+        transform: `translateX(-50%) translateY(${hidden ? "-5rem" : "0"})`,
       }}
     >
-      {!isOpen ? (
+      {!searchOpen && !contactOpen && (
         <div className="flex items-center gap-2">
           <button
-            onClick={toggle}
+            onClick={() => {
+              setContactOpen(false);
+              setSearchOpen(true);
+            }}
             className="bg-gray-800/60 text-white w-10 h-10 rounded-2xl shadow-md flex items-center justify-center backdrop-blur-lg transition-transform transform hover:scale-110"
+            aria-label="Open search"
           >
             <Icon icon="mdi:magnify" width={22} height={22} />
           </button>
+
           {hasEmail && (
             <button
               onClick={() => {
-                setIsOpen(false);
+                setSearchOpen(false);
                 setContactOpen(true);
               }}
               className="bg-gray-800/60 text-white w-10 h-10 rounded-2xl shadow-md flex items-center justify-center backdrop-blur-lg transition-transform transform hover:scale-110"
+              aria-label="Contact gallery"
             >
               <Icon icon="mdi:email-outline" width={22} height={22} />
             </button>
           )}
         </div>
-      ) : (
+      )}
+
+      {searchOpen && (
         <div className="w-[calc(100vw-2rem)] max-w-md">
-          <div className="backdrop-blur-lg bg-gray-800/60 shadow-md rounded-2xl px-4 py-3 space-y-2">
+          <div className="backdrop-blur-lg bg-gray-800/60 shadow-md rounded-2xl px-4 py-3 space-y-2 border border-gray-700/60">
             <div className="flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 px-3 gap-2">
               <Icon icon="fluent:search-20-regular" className="text-gray-400 flex-shrink-0" width={20} />
               <input
-                ref={inputRef}
+                ref={searchInputRef}
                 type="text"
                 placeholder="Description, artist, style..."
                 value={query}
@@ -114,6 +152,7 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
                 <Icon icon="mdi:close-circle" width={20} height={20} />
               </button>
             </div>
+
             <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm w-fit">
               {([
                 ["available", "Available"],
@@ -168,16 +207,74 @@ export default function MobileSearchBar({ onSearch }: MobileSearchBarProps) {
 
             <div className="flex justify-center pt-1">
               <button
-                onClick={toggle}
+                onClick={() => {
+                  searchInputRef.current?.blur();
+                  setSearchOpen(false);
+                }}
                 className="w-10 h-1.5 rounded-full bg-gray-500/70 hover:bg-gray-400/80 transition-colors"
                 aria-label="Collapse search panel"
-                title="Collapse"
               />
             </div>
           </div>
         </div>
       )}
-      <ContactInquiryPanel open={contactOpen} onClose={() => setContactOpen(false)} />
+
+      {contactOpen && (
+        <div className="w-[calc(100vw-2rem)] max-w-md">
+          <div className="backdrop-blur-lg bg-gray-800/60 shadow-md rounded-2xl px-4 py-3 space-y-3 border border-gray-700/60">
+            <p className="text-white text-sm font-medium">Contact the gallery</p>
+            <p className="text-gray-400 text-xs">
+              Share your email and note. Tip: like paintings you ask about so we can narrow options quickly.
+            </p>
+
+            <input
+              ref={emailInputRef}
+              type="email"
+              placeholder="Your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full h-11 rounded-full border border-gray-600 bg-gray-700/40 px-4 text-white placeholder-gray-400 outline-none text-[16px]"
+            />
+            <textarea
+              placeholder="Short comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              rows={3}
+              className="w-full rounded-2xl border border-gray-600 bg-gray-700/40 px-4 py-3 text-white placeholder-gray-400 outline-none text-[16px]"
+            />
+
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={() => {
+                  emailInputRef.current?.blur();
+                  setContactOpen(false);
+                }}
+                className="h-10 px-4 rounded-full border border-gray-600 text-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitContact}
+                disabled={busy || !emailValid || !comment.trim()}
+                className="h-10 px-4 rounded-full bg-red-500/80 text-white disabled:opacity-40"
+              >
+                {ok ? "Sent" : busy ? "Sending..." : "Send"}
+              </button>
+            </div>
+
+            <div className="flex justify-center pt-1">
+              <button
+                onClick={() => {
+                  emailInputRef.current?.blur();
+                  setContactOpen(false);
+                }}
+                className="w-10 h-1.5 rounded-full bg-gray-500/70 hover:bg-gray-400/80 transition-colors"
+                aria-label="Collapse contact panel"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
