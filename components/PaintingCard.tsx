@@ -46,10 +46,10 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
           style={{ borderRadius: "10px", transition: "all 0.3s ease" }}
         >
           {/* Price badge — left-7 top-7 matches .ru */}
-          {painting.export_price && painting.export_price > 0 && (
+          {painting.price && painting.price > 0 && (
             <div className="absolute left-7 top-7 z-20 inline-flex h-7 items-center rounded-md bg-gray-800/60 px-2">
               <span className="text-xs font-medium leading-none text-white">
-                {formatPrice(painting.export_price, "USD")}
+                {formatPrice(painting.price, painting.currency || "USD")}
               </span>
             </div>
           )}
