@@ -30,6 +30,7 @@ export interface PaintingDetail {
   title_ru: string | null;
   description: string | null;
   description_ru: string | null;
+  notes: string | null;
   notes_ru: string | null;
   year: number | null;
   artist_id: number | null;

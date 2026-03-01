@@ -159,7 +159,7 @@ export default async function PaintingDetailPage({
           )}
 
           {/* Evaluation */}
-          {p.notes_ru && <ArtworkRating notesRu={p.notes_ru} />}
+          {p.notes && <ArtworkRating notesRu={p.notes} />}
 
           {/* Attribute chips */}
           <div className="flex flex-wrap gap-2">
