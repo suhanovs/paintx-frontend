@@ -49,7 +49,7 @@ export async function generateMetadata({
     const p: PaintingDetail = await fetchPaintingBySlugServer(slug);
     const mid = midUrl(p.image_mid_res_filename);
     const canonicalUrl = `https://www.paintx.art/art/${slug}`;
-    const title = p.title || p.title_ru || "Painting";
+    const title = p.title || "Painting";
     const artist = p.artist_name_en || p.artist_name;
     const pageTitle = artist ? `${title} by ${artist}` : title;
     const desc =
@@ -104,7 +104,7 @@ export default async function PaintingDetailPage({
   const mid  = midUrl(p.image_mid_res_filename);
   const full = fullUrl(p.image_full_res_filename || p.image_mid_res_filename);
   const price = formatPrice(p.export_price, "USD");
-  const title = p.title || p.title_ru || "Untitled";
+  const title = p.title || "Untitled";
   const artistName = p.artist_name_en || p.artist_name;
   const artistBio  = p.artist_about_en || p.artist_about;
   // Keep UUID for related endpoints
