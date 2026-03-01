@@ -226,12 +226,7 @@ export default async function PaintingDetailPage({
           {/* Artist */}
           {artistName && (
             <div className="border-t border-gray-800 pt-4">
-              <Link
-                href={`/artist/${slugifyFacet(artistName)}`}
-                className={`${DETAIL_PILL_CLASS} inline-flex mb-2 hover:bg-gray-600 transition-colors`}
-              >
-                {artistName}
-              </Link>
+              <p className="text-base font-semibold text-white mb-2">{artistName}</p>
               {artistBio && (
                 <p
                   className="text-sm text-gray-400 leading-relaxed"
