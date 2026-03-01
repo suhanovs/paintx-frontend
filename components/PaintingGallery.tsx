@@ -67,6 +67,15 @@ export default function PaintingGallery({
     return () => mq.removeEventListener("change", apply);
   }, []);
 
+  useEffect(() => {
+    setPaintings(initialPaintings);
+    setPage(initialPage);
+    setTotalPagesState(Math.max(1, totalPages));
+    setHasMore(initialPage < totalPages);
+    if (initialSearchState) setSearchState(initialSearchState);
+    isFetching.current = false;
+  }, [initialPaintings, initialPage, totalPages, initialSearchState]);
+
   const getVisitorCookie = () => {
     const name = "paintx_vid=";
     const existing = document.cookie
