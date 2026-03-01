@@ -172,7 +172,7 @@ export default async function PaintingDetailPage({
             )}
             {p.medium_name && !UNKNOWN.includes(p.medium_name) && (
               <Link
-                href={`/?${new URLSearchParams({ page: "1", search: `"${p.medium_name}"` }).toString()}`}
+                href={`/medium/${slugifyFacet(p.medium_name)}`}
                 className={`${DETAIL_PILL_CLASS} hover:bg-gray-600 transition-colors`}
               >
                 {p.medium_name}
@@ -180,7 +180,7 @@ export default async function PaintingDetailPage({
             )}
             {p.canvas_name && !UNKNOWN.includes(p.canvas_name) && (
               <Link
-                href={`/?${new URLSearchParams({ page: "1", search: `"${p.canvas_name}"` }).toString()}`}
+                href={`/canvas/${slugifyFacet(p.canvas_name)}`}
                 className={`${DETAIL_PILL_CLASS} hover:bg-gray-600 transition-colors`}
               >
                 {p.canvas_name}

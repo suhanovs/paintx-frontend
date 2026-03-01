@@ -48,6 +48,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let paintingRoutes: MetadataRoute.Sitemap = [];
   let styleRoutes: MetadataRoute.Sitemap = [];
   let artistRoutes: MetadataRoute.Sitemap = [];
+  let mediumRoutes: MetadataRoute.Sitemap = [];
+  let canvasRoutes: MetadataRoute.Sitemap = [];
   try {
     const slugs = await fetchAllSlugs();
     paintingRoutes = slugs.map((slug) => ({
@@ -57,7 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    const { styles, artists } = await fetchFacetNames();
+    const { styles, artists, mediums, canvases } = await fetchFacetNames();
     styleRoutes = styles.map((name) => ({
       url: `${SITE_URL}/style/${slugifyFacet(name)}`,
       lastModified: new Date(),
@@ -70,9 +72,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.7,
     }));
+    mediumRoutes = mediums.map((name) => ({
+      url: `${SITE_URL}/medium/${slugifyFacet(name)}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.65,
+    }));
+    canvasRoutes = canvases.map((name) => ({
+      url: `${SITE_URL}/canvas/${slugifyFacet(name)}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.65,
+    }));
   } catch {
     // Degrade gracefully
   }
 
-  return [...staticRoutes, ...paintingRoutes, ...styleRoutes, ...artistRoutes];
+  return [...staticRoutes, ...paintingRoutes, ...styleRoutes, ...artistRoutes, ...mediumRoutes, ...canvasRoutes];
 }
