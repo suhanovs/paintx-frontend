@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { fetchFacetNames, slugifyFacet } from "@/lib/facets";
 
 const INTERNAL_API_URL =
   process.env.INTERNAL_API_URL || "http://localhost:8000";
@@ -45,6 +46,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Dynamic painting pages
   let paintingRoutes: MetadataRoute.Sitemap = [];
+  let styleRoutes: MetadataRoute.Sitemap = [];
+  let artistRoutes: MetadataRoute.Sitemap = [];
   try {
     const slugs = await fetchAllSlugs();
     paintingRoutes = slugs.map((slug) => ({
@@ -53,9 +56,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.8,
     }));
+
+    const { styles, artists } = await fetchFacetNames();
+    styleRoutes = styles.map((name) => ({
+      url: `${SITE_URL}/style/${slugifyFacet(name)}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+    artistRoutes = artists.map((name) => ({
+      url: `${SITE_URL}/artist/${slugifyFacet(name)}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
   } catch {
     // Degrade gracefully
   }
 
-  return [...staticRoutes, ...paintingRoutes];
+  return [...staticRoutes, ...paintingRoutes, ...styleRoutes, ...artistRoutes];
 }

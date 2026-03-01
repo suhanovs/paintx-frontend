@@ -7,21 +7,21 @@ import MobileSearchBar from "./MobileSearchBar";
 
 const DEBOUNCE_MS = 700;
 
-export default function NavbarWrapper() {
+export default function NavbarWrapper({ initialState }: { initialState?: SearchState }) {
   const searchParams = useSearchParams();
   const isFirstRender = useRef(true);
 
   const urlState = useMemo<SearchState>(() => {
-    const query = searchParams.get("search") ?? "";
-    const statusParam = searchParams.get("status");
-    const sortParam = searchParams.get("sort");
+    const query = searchParams.get("search") ?? initialState?.query ?? "";
+    const statusParam = searchParams.get("status") ?? initialState?.status;
+    const sortParam = searchParams.get("sort") ?? initialState?.sort;
     const status =
       statusParam === "sold" || statusParam === "all" || statusParam === "liked"
         ? statusParam
         : "available";
     const sort = sortParam === "oldest" ? "oldest" : "newest";
     return { query, status, sort };
-  }, [searchParams]);
+  }, [initialState, searchParams]);
 
   const [pending, setPending] = useState<SearchState>(urlState);
 

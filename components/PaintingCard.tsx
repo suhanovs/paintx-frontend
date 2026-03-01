@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Icon } from "@iconify/react";
 import type { PaintingListItem } from "@/types";
 import { midUrl, fullUrl, formatPrice } from "@/lib/api";
+import { slugifyFacet } from "@/lib/facets";
 import PaintingModal from "./PaintingModal";
 
 interface PaintingCardProps {
@@ -104,7 +105,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               </h3>
               {painting.artist_name && (
                 <Link
-                  href={`/?${new URLSearchParams({ page: "1", search: `"${painting.artist_name}"` }).toString()}`}
+                  href={`/artist/${slugifyFacet(painting.artist_name)}`}
                   className="inline-flex items-center px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-medium hover:bg-gray-700 transition-colors whitespace-nowrap flex-shrink-0"
                   aria-label={`Filter by artist ${painting.artist_name}`}
                 >
@@ -117,7 +118,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
             <div className="flex items-start flex-wrap gap-2 mt-1">
               {painting.style_name && !UNKNOWN.includes(painting.style_name) && (
                 <Link
-                  href={`/?${new URLSearchParams({ page: "1", search: `"${painting.style_name}"` }).toString()}`}
+                  href={`/style/${slugifyFacet(painting.style_name)}`}
                   className="inline-flex items-center px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-medium hover:bg-gray-700 transition-colors"
                   aria-label={`Filter by style ${painting.style_name}`}
                 >
