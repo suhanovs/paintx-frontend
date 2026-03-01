@@ -5,6 +5,7 @@ import { fetchPaintingsServer } from "@/lib/api";
 import { fetchFacetNames, slugifyFacet } from "@/lib/facets";
 
 export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   const { mediums } = await fetchFacetNames();
@@ -32,15 +33,7 @@ export default async function MediumPage({ params, searchParams }: {
   const page = Math.max(1, Number.parseInt(pageRaw ?? "1", 10) || 1);
 
   const { mediums } = await fetchFacetNames();
-  const mediumName = mediums.find((m) => slugifyFacet(m) === slug);
-  if (!mediumName) {
-    return (
-      <>
-        <NavbarWrapper />
-        <main className="min-h-screen flex items-center justify-center text-gray-300">Medium not found.</main>
-      </>
-    );
-  }
+  const mediumName = mediums.find((m) => slugifyFacet(m) === slug) || slug.replace(/-/g, " ");
 
   const query = `"${mediumName}"`;
   const data = await fetchPaintingsServer(page, query, 30, "available", "newest");

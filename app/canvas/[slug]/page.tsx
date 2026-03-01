@@ -5,6 +5,7 @@ import { fetchPaintingsServer } from "@/lib/api";
 import { fetchFacetNames, slugifyFacet } from "@/lib/facets";
 
 export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   const { canvases } = await fetchFacetNames();
@@ -32,15 +33,7 @@ export default async function CanvasPage({ params, searchParams }: {
   const page = Math.max(1, Number.parseInt(pageRaw ?? "1", 10) || 1);
 
   const { canvases } = await fetchFacetNames();
-  const canvasName = canvases.find((c) => slugifyFacet(c) === slug);
-  if (!canvasName) {
-    return (
-      <>
-        <NavbarWrapper />
-        <main className="min-h-screen flex items-center justify-center text-gray-300">Canvas not found.</main>
-      </>
-    );
-  }
+  const canvasName = canvases.find((c) => slugifyFacet(c) === slug) || slug.replace(/-/g, " ");
 
   const query = `"${canvasName}"`;
   const data = await fetchPaintingsServer(page, query, 30, "available", "newest");
