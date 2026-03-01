@@ -54,21 +54,22 @@ export default function PaintingScroller({
     return () => el.removeEventListener("scroll", update);
   }, [paintings]);
 
-  if (!isLoading && paintings.length === 0) return null;
+  const showEmpty = !isLoading && paintings.length === 0;
 
   return (
-    <div className="relative w-full mt-8">
+    <div className="relative w-full mt-8 min-h-[188px]">
       <h2 className="text-sm font-medium text-gray-400 mb-4">{title}</h2>
-      <div className="relative">
+      <div className="relative h-36 rounded-lg bg-gray-900/20">
         {isLoading ? (
           <div className="h-36 flex items-center justify-center bg-gray-900/40 rounded-lg">
             <div className="w-7 h-7 border-4 border-t-transparent border-white rounded-full animate-spin" />
           </div>
+        ) : showEmpty ? (
+          <div className="h-36" aria-hidden="true" />
         ) : (
           <div
             ref={containerRef}
-            className="flex overflow-x-auto gap-3 snap-x snap-mandatory scrollbar-hide"
-            style={{ minHeight: "144px" }}
+            className="flex h-36 overflow-x-auto gap-3 snap-x snap-mandatory scrollbar-hide"
           >
             {paintings.map((p) => (
               <Link
