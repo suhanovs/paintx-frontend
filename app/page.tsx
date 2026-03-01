@@ -17,8 +17,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function GalleryPage() {
-  const data = await fetchPaintingsServer(1, undefined, 30);
+export default async function GalleryPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = (await searchParams) ?? {};
+  const pageRaw = Array.isArray(sp.page) ? sp.page[0] : sp.page;
+  const searchRaw = Array.isArray(sp.search) ? sp.search[0] : sp.search;
+  const statusRaw = Array.isArray(sp.status) ? sp.status[0] : sp.status;
+  const sortRaw = Array.isArray(sp.sort) ? sp.sort[0] : sp.sort;
+
+  const page = Math.max(1, Number.parseInt(pageRaw ?? "1", 10) || 1);
+  const search = (searchRaw ?? "").trim();
+  const status = (statusRaw === "sold" || statusRaw === "all" || statusRaw === "liked" ? statusRaw : "available") as
+    | "available"
+    | "sold"
+    | "all"
+    | "liked";
+  const sort = (sortRaw === "oldest" ? "oldest" : "newest") as "newest" | "oldest";
+
+  const data = await fetchPaintingsServer(page, search || undefined, 30, status, sort);
 
   return (
     <>
@@ -26,8 +45,9 @@ export default async function GalleryPage() {
       <main>
         <PaintingGallery
           initialPaintings={data.items}
-          initialPage={1}
+          initialPage={page}
           totalPages={data.pages}
+          initialSearchState={{ query: search, status, sort }}
         />
       </main>
     </>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import Link from "next/link";
 import type { PaintingListItem } from "@/types";
 import PaintingCard from "./PaintingCard";
 import type { SearchState } from "./Navbar";
@@ -9,6 +10,7 @@ interface PaintingGalleryProps {
   initialPaintings: PaintingListItem[];
   initialPage: number;
   totalPages: number;
+  initialSearchState?: SearchState;
 }
 
 const PAGE_SIZE = 30;
@@ -18,12 +20,15 @@ export default function PaintingGallery({
   initialPaintings,
   initialPage,
   totalPages,
+  initialSearchState,
 }: PaintingGalleryProps) {
   const [paintings, setPaintings] = useState<PaintingListItem[]>(initialPaintings);
   const [page, setPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialPage < totalPages);
-  const [searchState, setSearchState] = useState<SearchState>({ query: "", status: "available", sort: "newest" });
+  const [searchState, setSearchState] = useState<SearchState>(
+    initialSearchState ?? { query: "", status: "available", sort: "newest" },
+  );
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [isDesktop, setIsDesktop] = useState(false);
   const isFetching = useRef(false);
@@ -176,13 +181,17 @@ export default function PaintingGallery({
     return Array.from({ length: end - adjustedStart + 1 }, (_, i) => adjustedStart + i);
   }, [page, totalKnownPages]);
 
-  const goToPage = useCallback(
-    (nextPage: number) => {
-      if (nextPage < 1 || nextPage > totalKnownPages || nextPage === page || isLoading) return;
-      fetchMore(nextPage, searchState, false);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+  const buildPageHref = useCallback(
+    (targetPage: number) => {
+      const params = new URLSearchParams();
+      params.set("page", String(targetPage));
+      if (searchState.query) params.set("search", searchState.query);
+      if (searchState.status !== "available") params.set("status", searchState.status);
+      if (searchState.sort !== "newest") params.set("sort", searchState.sort);
+      const q = params.toString();
+      return q ? `/?${q}` : "/";
     },
-    [fetchMore, isLoading, page, searchState, totalKnownPages],
+    [searchState],
   );
 
   return (
@@ -211,38 +220,45 @@ export default function PaintingGallery({
         <p className="text-center text-gray-500 py-8 text-sm">All {paintings.length} paintings loaded</p>
       )}
 
-      {isDesktop && totalKnownPages > 1 && (
-        <div className="flex items-center justify-center gap-2 py-8 flex-wrap">
-          <button
-            onClick={() => goToPage(page - 1)}
-            disabled={page <= 1 || isLoading}
-            className="px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap disabled:opacity-40"
-          >
-            Prev
-          </button>
-
-          {visiblePages.map((pNum) => (
-            <button
-              key={pNum}
-              onClick={() => goToPage(pNum)}
-              disabled={isLoading}
-              className={
-                pNum === page
-                  ? "px-3 py-1 bg-red-600 text-white rounded-full text-sm font-medium whitespace-nowrap"
-                  : "px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap disabled:opacity-40"
-              }
+      {totalKnownPages > 1 && (
+        <div className="hidden lg:flex items-center justify-center gap-2 py-8 flex-wrap">
+          {page > 1 ? (
+            <Link
+              href={buildPageHref(page - 1)}
+              className="rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm"
             >
-              {pNum}
-            </button>
-          ))}
+              Prev
+            </Link>
+          ) : (
+            <span className="rounded-full px-3 py-2 border border-gray-600 bg-gray-700/20 text-gray-500 text-sm">Prev</span>
+          )}
 
-          <button
-            onClick={() => goToPage(page + 1)}
-            disabled={page >= totalKnownPages || isLoading}
-            className="px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap disabled:opacity-40"
-          >
-            Next
-          </button>
+          {visiblePages.map((pNum) => {
+            const active = pNum === page;
+            return (
+              <Link
+                key={pNum}
+                href={buildPageHref(pNum)}
+                aria-current={active ? "page" : undefined}
+                className={`rounded-full px-3 py-2 transition-colors border border-gray-600 text-sm ${
+                  active ? "bg-red-500/25 text-red-200" : "bg-gray-700/40 text-gray-300"
+                }`}
+              >
+                {pNum}
+              </Link>
+            );
+          })}
+
+          {page < totalKnownPages ? (
+            <Link
+              href={buildPageHref(page + 1)}
+              className="rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm"
+            >
+              Next
+            </Link>
+          ) : (
+            <span className="rounded-full px-3 py-2 border border-gray-600 bg-gray-700/20 text-gray-500 text-sm">Next</span>
+          )}
         </div>
       )}
     </div>
