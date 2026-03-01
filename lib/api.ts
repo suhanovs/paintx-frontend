@@ -17,7 +17,8 @@ export function fullUrl(filename: string | null | undefined): string {
 
 export function formatPrice(
   price: number | null | undefined,
-  currency = "USD"
+  currency = "USD",
+  showCode = false,
 ): string {
   if (!price || price <= 0) return "Price on request";
   const code = (currency || "USD").toUpperCase();
@@ -29,9 +30,9 @@ export function formatPrice(
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
-    return `${formatted} ${code}`;
+    return showCode ? `${formatted} ${code}` : formatted;
   } catch {
-    return `${price} ${code}`;
+    return showCode ? `${price} ${code}` : `${price}`;
   }
 }
 

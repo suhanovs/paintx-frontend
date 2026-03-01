@@ -105,7 +105,7 @@ export default async function PaintingDetailPage({
 
   const mid  = midUrl(p.image_mid_res_filename);
   const full = fullUrl(p.image_full_res_filename || p.image_mid_res_filename);
-  const price = formatPrice(p.price, p.currency || "USD");
+  const price = formatPrice(p.price, p.currency || "USD", true);
   const title = p.title || "Untitled";
   const artistName = p.artist_name_en || p.artist_name;
   const artistBio  = p.artist_about_en || p.artist_about;

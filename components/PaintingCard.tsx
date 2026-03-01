@@ -151,7 +151,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
                     headers: { "x-visitor-cookie": getVisitorCookie() },
                   }).catch(() => undefined);
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm hover:bg-gray-700/60"
               >
                 Details
                 <Icon icon="mdi:eye-outline" width={16} />
