@@ -45,6 +45,7 @@ export interface PaintingDetail {
   artist_max_price: number | null;
   artist_works_count: number | null;
   availability: string | null;
+  condition: string | null;
   canvas_height: number | null;
   canvas_width: number | null;
   canvas_name: string | null;

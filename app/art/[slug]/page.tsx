@@ -117,14 +117,14 @@ export default async function PaintingDetailPage({
 
       <div className="flex flex-col lg:flex-row gap-8 p-6 lg:p-10 max-w-7xl mx-auto">
         {/* Left: Image + related scrollers */}
-        <div className="lg:w-3/5">
+        <div className="lg:w-1/2">
           <DetailImage mid={mid} full={full} alt={title} />
           <PaintingScroller title="More by this artist" paintingId={paintingId} relatedType="artist" />
           <PaintingScroller title="Similar style"       paintingId={paintingId} relatedType="style"  />
         </div>
 
         {/* Right: Details */}
-        <div className="flex flex-col gap-5 lg:w-2/5">
+        <div className="flex flex-col gap-5 lg:w-1/2">
           <h1 className="text-3xl font-bold">
             {title}
             {p.year && p.year > 0 ? `, ${p.year}` : ""}
@@ -133,22 +133,28 @@ export default async function PaintingDetailPage({
           {/* Price */}
           <div className="text-xl font-semibold text-gray-200">{price}</div>
 
-          {/* Primary status chip */}
-          <div className="flex flex-wrap gap-2">
+          {/* Status + condition + one-line range */}
+          <div className="flex items-center gap-3 flex-wrap lg:flex-nowrap">
             {p.availability && (
-              <span className="px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium">
+              <span className="px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap">
                 {p.availability}
               </span>
             )}
+            {p.condition && !UNKNOWN.includes(p.condition) && (
+              <span className="px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap">
+                {p.condition}
+              </span>
+            )}
+            <div className="flex-1 min-w-[180px] lg:min-w-[220px]">
+              <ArtistPriceRange
+                min={p.artist_min_price ?? 0}
+                max={p.artist_max_price ?? 0}
+                current={p.export_price ?? 0}
+                count={p.artist_works_count ?? 0}
+                currency="USD"
+              />
+            </div>
           </div>
-
-          <ArtistPriceRange
-            min={p.artist_min_price ?? 0}
-            max={p.artist_max_price ?? 0}
-            current={p.export_price ?? 0}
-            count={p.artist_works_count ?? 0}
-            currency="USD"
-          />
 
           {/* Description */}
           {p.description && (
