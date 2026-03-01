@@ -162,9 +162,9 @@ export default function Navbar({ onSearch, initialState }: NavbarProps) {
               <button
                 key={key}
                 onClick={() => (key === "email" ? setContactOpen(true) : url && window.open(url, "_blank"))}
-                className={`inline-flex items-center justify-center rounded-full w-9 h-9 border border-gray-600 bg-gray-700/40 text-gray-300 text-sm transition-colors hover:bg-gray-700/60 ${buttonClass}`}
+                className={`inline-flex items-center justify-center rounded-full w-10 h-10 border border-gray-600 bg-gray-700/40 text-gray-300 text-sm transition-colors hover:bg-gray-700/60 ${buttonClass}`}
               >
-                <Icon icon={icon} width={18} height={18} />
+                <Icon icon={icon} width={20} height={20} />
               </button>
             ))}
           </div>
