@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "@iconify/react";
 import ContactInquiryPanel from "./ContactInquiryPanel";
 
 interface Props {
@@ -19,9 +20,11 @@ export default function DetailInquiryCta({ title, slug }: Props) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm transition-colors"
+          className="bg-gray-700 text-white w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-110 hover:bg-red-500"
+          aria-label="Contact about this painting"
+          title="Contact about this painting"
         >
-          Contact about this painting
+          <Icon icon="mdi:email-outline" width={24} height={24} />
         </button>
       </div>
 
