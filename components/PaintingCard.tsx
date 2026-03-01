@@ -113,7 +113,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
             <div className="flex items-start flex-wrap gap-2 mt-1">
               {painting.style_name && !UNKNOWN.includes(painting.style_name) && (
                 <Link
-                  href={`/?page=1&search=${encodeURIComponent(painting.style_name)}`}
+                  href={`/?${new URLSearchParams({ page: "1", search: `"${painting.style_name}"` }).toString()}`}
                   className="inline-flex items-center px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-medium hover:bg-gray-700 transition-colors"
                   aria-label={`Filter by style ${painting.style_name}`}
                 >
