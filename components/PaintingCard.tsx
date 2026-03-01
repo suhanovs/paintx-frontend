@@ -112,9 +112,13 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
             {/* Chips */}
             <div className="flex items-start flex-wrap gap-2 mt-1">
               {painting.style_name && !UNKNOWN.includes(painting.style_name) && (
-                <span className="inline-flex items-center px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-medium">
+                <Link
+                  href={`/?page=1&search=${encodeURIComponent(painting.style_name)}`}
+                  className="inline-flex items-center px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-medium hover:bg-gray-700 transition-colors"
+                  aria-label={`Filter by style ${painting.style_name}`}
+                >
                   {painting.style_name}
-                </span>
+                </Link>
               )}
               {painting.canvas_width && painting.canvas_height && (
                 <span className="inline-flex items-center px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-xs font-medium">
