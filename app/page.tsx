@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default async function GalleryPage() {
-  const data = await fetchPaintingsServer(1);
+  const data = await fetchPaintingsServer(1, undefined, 30);
 
   return (
     <>

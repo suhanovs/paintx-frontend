@@ -36,8 +36,8 @@ export function formatPrice(
 export const INTERNAL_API_URL =
   process.env.INTERNAL_API_URL || "http://localhost:8000";
 
-export async function fetchPaintingsServer(page: number, search?: string) {
-  const params = new URLSearchParams({ page: String(page), limit: "12" });
+export async function fetchPaintingsServer(page: number, search?: string, limit = 30) {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
   if (search) params.set("search", search);
   const res = await fetch(`${INTERNAL_API_URL}/api/paintings?${params}`, {
     next: { revalidate: 60 },

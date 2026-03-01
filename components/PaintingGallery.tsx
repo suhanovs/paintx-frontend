@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import type { PaintingListItem } from "@/types";
 import PaintingCard from "./PaintingCard";
 import type { SearchState } from "./Navbar";
@@ -10,6 +10,9 @@ interface PaintingGalleryProps {
   initialPage: number;
   totalPages: number;
 }
+
+const PAGE_SIZE = 30;
+const DESKTOP_MEDIA = "(min-width: 1024px)";
 
 export default function PaintingGallery({
   initialPaintings,
@@ -22,6 +25,7 @@ export default function PaintingGallery({
   const [hasMore, setHasMore] = useState(initialPage < totalPages);
   const [searchState, setSearchState] = useState<SearchState>({ query: "", status: "available", sort: "newest" });
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+  const [isDesktop, setIsDesktop] = useState(false);
   const isFetching = useRef(false);
   const observer = useRef<IntersectionObserver | null>(null);
   const lastCardRef = useRef<HTMLDivElement | null>(null);
@@ -37,6 +41,14 @@ export default function PaintingGallery({
     };
     window.addEventListener("paintx:search", handler);
     return () => window.removeEventListener("paintx:search", handler);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia(DESKTOP_MEDIA);
+    const apply = () => setIsDesktop(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
   }, []);
 
   const getVisitorCookie = () => {
@@ -110,7 +122,7 @@ export default function PaintingGallery({
     try {
       const params = new URLSearchParams({
         page: String(nextPage),
-        limit: "12",
+        limit: String(PAGE_SIZE),
       });
       if (state.query) params.set("search", state.query);
       params.set("status", state.status);
@@ -142,7 +154,7 @@ export default function PaintingGallery({
     (node: HTMLDivElement | null) => {
       if (observer.current) observer.current.disconnect();
       lastCardRef.current = node;
-      if (!node || !hasMore) return;
+      if (!node || !hasMore || isDesktop) return;
       observer.current = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting && !isFetching.current && hasMore) {
@@ -153,7 +165,24 @@ export default function PaintingGallery({
       );
       observer.current.observe(node);
     },
-    [hasMore, page, searchState, fetchMore],
+    [hasMore, isDesktop, page, searchState, fetchMore],
+  );
+
+  const totalKnownPages = useMemo(() => Math.max(totalPages, page, 1), [page, totalPages]);
+  const visiblePages = useMemo(() => {
+    const start = Math.max(1, page - 2);
+    const end = Math.min(totalKnownPages, start + 4);
+    const adjustedStart = Math.max(1, end - 4);
+    return Array.from({ length: end - adjustedStart + 1 }, (_, i) => adjustedStart + i);
+  }, [page, totalKnownPages]);
+
+  const goToPage = useCallback(
+    (nextPage: number) => {
+      if (nextPage < 1 || nextPage > totalKnownPages || nextPage === page || isLoading) return;
+      fetchMore(nextPage, searchState, false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [fetchMore, isLoading, page, searchState, totalKnownPages],
   );
 
   return (
@@ -166,20 +195,55 @@ export default function PaintingGallery({
               key={painting.id}
               painting={painting}
               initiallyLiked={likedIds.has(painting.id)}
-              ref={isLast ? setLastCardRef : null}
+              ref={!isDesktop && isLast ? setLastCardRef : null}
             />
           );
         })}
       </div>
 
-      {isLoading && (
+      {isLoading && !isDesktop && (
         <div className="flex justify-center py-8">
           <div className="w-8 h-8 border-4 border-t-transparent border-white rounded-full animate-spin" />
         </div>
       )}
 
-      {!hasMore && paintings.length > 0 && (
+      {!isDesktop && !hasMore && paintings.length > 0 && (
         <p className="text-center text-gray-500 py-8 text-sm">All {paintings.length} paintings loaded</p>
+      )}
+
+      {isDesktop && totalKnownPages > 1 && (
+        <div className="flex items-center justify-center gap-2 py-8 flex-wrap">
+          <button
+            onClick={() => goToPage(page - 1)}
+            disabled={page <= 1 || isLoading}
+            className="px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap disabled:opacity-40"
+          >
+            Prev
+          </button>
+
+          {visiblePages.map((pNum) => (
+            <button
+              key={pNum}
+              onClick={() => goToPage(pNum)}
+              disabled={isLoading}
+              className={
+                pNum === page
+                  ? "px-3 py-1 bg-red-600 text-white rounded-full text-sm font-medium whitespace-nowrap"
+                  : "px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap disabled:opacity-40"
+              }
+            >
+              {pNum}
+            </button>
+          ))}
+
+          <button
+            onClick={() => goToPage(page + 1)}
+            disabled={page >= totalKnownPages || isLoading}
+            className="px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
       )}
     </div>
   );
