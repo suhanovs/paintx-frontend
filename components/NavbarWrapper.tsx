@@ -1,40 +1,37 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Navbar, { type SearchState } from "./Navbar";
 import MobileSearchBar from "./MobileSearchBar";
 
 const DEBOUNCE_MS = 700;
 
 export default function NavbarWrapper() {
-  const [pending, setPending] = useState<SearchState>({ query: "", status: "available", sort: "newest" });
-  const [urlState, setUrlState] = useState<SearchState>({ query: "", status: "available", sort: "newest" });
+  const searchParams = useSearchParams();
   const isFirstRender = useRef(true);
+
+  const urlState = useMemo<SearchState>(() => {
+    const query = searchParams.get("search") ?? "";
+    const statusParam = searchParams.get("status");
+    const sortParam = searchParams.get("sort");
+    const status =
+      statusParam === "sold" || statusParam === "all" || statusParam === "liked"
+        ? statusParam
+        : "available";
+    const sort = sortParam === "oldest" ? "oldest" : "newest";
+    return { query, status, sort };
+  }, [searchParams]);
+
+  const [pending, setPending] = useState<SearchState>(urlState);
 
   const handleSearch = useCallback((state: SearchState) => {
     setPending(state);
   }, []);
 
   useEffect(() => {
-    const read = () => {
-      const params = new URLSearchParams(window.location.search);
-      const query = params.get("search") ?? "";
-      const statusParam = params.get("status");
-      const sortParam = params.get("sort");
-      const status =
-        statusParam === "sold" || statusParam === "all" || statusParam === "liked"
-          ? statusParam
-          : "available";
-      const sort = sortParam === "oldest" ? "oldest" : "newest";
-      const next = { query, status, sort } as SearchState;
-      setUrlState(next);
-      setPending(next);
-    };
-
-    read();
-    window.addEventListener("popstate", read);
-    return () => window.removeEventListener("popstate", read);
-  }, []);
+    setPending(urlState);
+  }, [urlState]);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -42,11 +39,19 @@ export default function NavbarWrapper() {
       return;
     }
 
+    if (
+      pending.query === urlState.query &&
+      pending.status === urlState.status &&
+      pending.sort === urlState.sort
+    ) {
+      return;
+    }
+
     const t = window.setTimeout(() => {
       window.dispatchEvent(new CustomEvent("paintx:search", { detail: pending }));
     }, DEBOUNCE_MS);
     return () => window.clearTimeout(t);
-  }, [pending]);
+  }, [pending, urlState]);
 
   return (
     <>
