@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { PaintingListItem } from "@/types";
 import PaintingCard from "./PaintingCard";
 import type { SearchState } from "./Navbar";
@@ -31,6 +32,8 @@ export default function PaintingGallery({
   );
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [isDesktop, setIsDesktop] = useState(false);
+  const [totalPagesState, setTotalPagesState] = useState(totalPages);
+  const router = useRouter();
   const isFetching = useRef(false);
   const observer = useRef<IntersectionObserver | null>(null);
   const lastCardRef = useRef<HTMLDivElement | null>(null);
@@ -42,11 +45,19 @@ export default function PaintingGallery({
       setPage(1);
       setPaintings([]);
       setHasMore(true);
+      setTotalPagesState(1);
       isFetching.current = false;
+
+      const params = new URLSearchParams();
+      params.set("page", "1");
+      if (detail.query) params.set("search", detail.query);
+      if (detail.status !== "available") params.set("status", detail.status);
+      if (detail.sort !== "newest") params.set("sort", detail.sort);
+      router.replace(`/?${params.toString()}`, { scroll: false });
     };
     window.addEventListener("paintx:search", handler);
     return () => window.removeEventListener("paintx:search", handler);
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const mq = window.matchMedia(DESKTOP_MEDIA);
@@ -140,6 +151,7 @@ export default function PaintingGallery({
       const data = await res.json();
       setPaintings((prev) => (append ? [...prev, ...data.items] : data.items));
       setPage(nextPage);
+      setTotalPagesState(Math.max(1, Number(data.pages) || 1));
       setHasMore(nextPage < data.pages);
     } catch (e) {
       console.error(e);
@@ -173,7 +185,7 @@ export default function PaintingGallery({
     [hasMore, isDesktop, page, searchState, fetchMore],
   );
 
-  const totalKnownPages = useMemo(() => Math.max(totalPages, page, 1), [page, totalPages]);
+  const totalKnownPages = useMemo(() => Math.max(totalPagesState, page, 1), [page, totalPagesState]);
   const visiblePages = useMemo(() => {
     const start = Math.max(1, page - 2);
     const end = Math.min(totalKnownPages, start + 4);
