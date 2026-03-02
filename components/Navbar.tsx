@@ -8,12 +8,13 @@ import { getEnabledContactIcons } from "@/lib/contactIcons";
 import ContactInquiryPanel from "./ContactInquiryPanel";
 
 export type SearchStatus = "available" | "sold" | "all" | "liked";
-export type SortOrder = "newest" | "oldest";
+export type SortOrder = "newest" | "oldest" | "price_desc" | "price_asc" | "year_asc" | "year_desc" | "listing_oldest";
 
 export interface SearchState {
   query: string;
   status: SearchStatus;
   sort: SortOrder;
+  minPrice?: number;
 }
 
 interface NavbarProps {

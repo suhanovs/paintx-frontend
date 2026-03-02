@@ -44,10 +44,12 @@ export async function fetchPaintingsServer(
   search?: string,
   limit = 30,
   status: "available" | "sold" | "all" | "liked" = "available",
-  sort: "newest" | "oldest" = "newest",
+  sort: "newest" | "oldest" | "price_desc" | "price_asc" | "year_asc" | "year_desc" | "listing_oldest" = "newest",
+  minPrice?: number,
 ) {
   const params = new URLSearchParams({ page: String(page), limit: String(limit), status, sort });
   if (search) params.set("search", search);
+  if (typeof minPrice === "number" && Number.isFinite(minPrice)) params.set("min_price", String(Math.max(0, Math.floor(minPrice))));
   const res = await fetch(`${INTERNAL_API_URL}/api/paintings?${params}`, {
     next: { revalidate: 60 },
   });

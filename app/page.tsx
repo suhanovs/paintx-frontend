@@ -15,10 +15,11 @@ export async function generateMetadata({
   const searchRaw = Array.isArray(sp.search) ? sp.search[0] : sp.search;
   const statusRaw = Array.isArray(sp.status) ? sp.status[0] : sp.status;
   const sortRaw = Array.isArray(sp.sort) ? sp.sort[0] : sp.sort;
+  const minPriceRaw = Array.isArray(sp.min_price) ? sp.min_price[0] : sp.min_price;
 
   const page = Math.max(1, Number.parseInt(pageRaw ?? "1", 10) || 1);
   const hasSearch = Boolean((searchRaw ?? "").trim());
-  const hasFilter = hasSearch || statusRaw === "sold" || statusRaw === "all" || statusRaw === "liked" || sortRaw === "oldest";
+  const hasFilter = hasSearch || statusRaw === "sold" || statusRaw === "all" || statusRaw === "liked" || sortRaw === "oldest" || sortRaw === "price_desc" || sortRaw === "price_asc" || sortRaw === "year_asc" || sortRaw === "year_desc" || sortRaw === "listing_oldest" || Boolean(minPriceRaw);
   const hasParams = hasFilter || page > 1;
 
   return {
@@ -55,6 +56,7 @@ export default async function GalleryPage({
   const searchRaw = Array.isArray(sp.search) ? sp.search[0] : sp.search;
   const statusRaw = Array.isArray(sp.status) ? sp.status[0] : sp.status;
   const sortRaw = Array.isArray(sp.sort) ? sp.sort[0] : sp.sort;
+  const minPriceRaw = Array.isArray(sp.min_price) ? sp.min_price[0] : sp.min_price;
 
   const page = Math.max(1, Number.parseInt(pageRaw ?? "1", 10) || 1);
   const search = (searchRaw ?? "").trim();
@@ -63,9 +65,18 @@ export default async function GalleryPage({
     | "sold"
     | "all"
     | "liked";
-  const sort = (sortRaw === "oldest" ? "oldest" : "newest") as "newest" | "oldest";
+  const allowedSorts = new Set(["newest", "oldest", "price_desc", "price_asc", "year_asc", "year_desc", "listing_oldest"]);
+  const sort = (allowedSorts.has((sortRaw ?? "").toLowerCase()) ? (sortRaw as string).toLowerCase() : "newest") as
+    | "newest"
+    | "oldest"
+    | "price_desc"
+    | "price_asc"
+    | "year_asc"
+    | "year_desc"
+    | "listing_oldest";
+  const minPrice = minPriceRaw ? Math.max(0, Number.parseInt(minPriceRaw, 10) || 0) : undefined;
 
-  const data = await fetchPaintingsServer(page, search || undefined, 30, status, sort);
+  const data = await fetchPaintingsServer(page, search || undefined, 30, status, sort, minPrice);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -104,7 +115,7 @@ export default async function GalleryPage({
           initialPaintings={data.items}
           initialPage={page}
           totalPages={data.pages}
-          initialSearchState={{ query: search, status, sort }}
+          initialSearchState={{ query: search, status, sort, minPrice }}
         />
       </main>
     </>

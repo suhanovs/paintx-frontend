@@ -29,7 +29,7 @@ export default function PaintingGallery({
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialPage < totalPages);
   const [searchState, setSearchState] = useState<SearchState>(
-    initialSearchState ?? { query: "", status: "available", sort: "newest" },
+    initialSearchState ?? { query: "", status: "available", sort: "newest", minPrice: undefined },
   );
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [isDesktop, setIsDesktop] = useState(false);
@@ -54,6 +54,7 @@ export default function PaintingGallery({
       if (detail.query) params.set("search", detail.query);
       if (detail.status !== "available") params.set("status", detail.status);
       if (detail.sort !== "newest") params.set("sort", detail.sort);
+      if (typeof detail.minPrice === "number") params.set("min_price", String(detail.minPrice));
       router.replace(`/?${params.toString()}`, { scroll: false });
     };
     window.addEventListener("paintx:search", handler);
@@ -112,6 +113,8 @@ export default function PaintingGallery({
       sessionStorage.setItem("gallerySearch", searchState.query);
       sessionStorage.setItem("galleryStatus", searchState.status);
       sessionStorage.setItem("gallerySort", searchState.sort);
+      if (typeof searchState.minPrice === "number") sessionStorage.setItem("galleryMinPrice", String(searchState.minPrice));
+      else sessionStorage.removeItem("galleryMinPrice");
     } catch {}
   }, [paintings, page, hasMore, searchState]);
 
@@ -128,10 +131,12 @@ export default function PaintingGallery({
         const restoredSearch = sessionStorage.getItem("gallerySearch") ?? "";
         const restoredStatus = (sessionStorage.getItem("galleryStatus") ?? "available") as SearchState["status"];
         const restoredSort = (sessionStorage.getItem("gallerySort") ?? "newest") as SearchState["sort"];
+        const restoredMinPriceRaw = sessionStorage.getItem("galleryMinPrice");
+        const restoredMinPrice = restoredMinPriceRaw ? Number.parseInt(restoredMinPriceRaw, 10) : undefined;
         setPaintings(restoredPaintings);
         setPage(restoredPage);
         setHasMore(restoredHasMore);
-        setSearchState({ query: restoredSearch, status: restoredStatus, sort: restoredSort });
+        setSearchState({ query: restoredSearch, status: restoredStatus, sort: restoredSort, minPrice: Number.isFinite(restoredMinPrice as number) ? restoredMinPrice : undefined });
         isFetching.current = false;
       } catch {}
     }
@@ -153,6 +158,7 @@ export default function PaintingGallery({
       if (state.query) params.set("search", state.query);
       params.set("status", state.status);
       params.set("sort", state.sort);
+      if (typeof state.minPrice === "number") params.set("min_price", String(state.minPrice));
 
       const res = await fetch(`/api/paintings?${params}`, {
         headers: { "x-visitor-cookie": getVisitorCookie() },
@@ -210,6 +216,7 @@ export default function PaintingGallery({
       if (searchState.query) params.set("search", searchState.query);
       if (searchState.status !== "available") params.set("status", searchState.status);
       if (searchState.sort !== "newest") params.set("sort", searchState.sort);
+      if (typeof searchState.minPrice === "number") params.set("min_price", String(searchState.minPrice));
       const q = params.toString();
       return q ? `/?${q}` : "/";
     },
@@ -226,6 +233,10 @@ export default function PaintingGallery({
     const links: Array<{ href: string; label: string }> = [];
     if (style) links.push({ href: `/style/${slugifyFacet(style)}`, label: `Browse ${style} paintings` });
     if (artist) links.push({ href: `/artist/${slugifyFacet(artist)}`, label: `Browse ${artist} paintings` });
+    links.push({ href: "/?status=available&sort=price_desc&min_price=1000", label: "Browse paintings over $1,000 (highest first)" });
+    links.push({ href: "/?status=available&sort=year_asc", label: "Browse oldest paintings by year" });
+    links.push({ href: "/?status=available&sort=listing_oldest", label: "Browse longest-listed paintings" });
+    links.push({ href: "/?status=sold&sort=newest", label: "Browse recently sold paintings" });
     return links;
   }, [paintings]);
 
@@ -298,7 +309,7 @@ export default function PaintingGallery({
       )}
 
       {footerLinks.length > 0 && (
-        <div className="hidden lg:flex items-center justify-center gap-3 pb-10 flex-wrap text-sm text-gray-400">
+        <div className="hidden lg:flex items-center justify-center gap-3 pt-4 pb-10 flex-wrap text-sm text-gray-400">
           <span className="text-gray-500">Explore:</span>
           {footerLinks.map((link) => (
             <Link
