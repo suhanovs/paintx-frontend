@@ -17,8 +17,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { canvases } = await fetchFacetNames();
   const name = canvases.find((c) => slugifyFacet(c) === slug) || slug;
   const canonicalUrl = `https://www.paintx.art/canvas/${slug}`;
-  const title = `${name} paintings | PaintX`;
-  const description = `Browse paintings on ${name} canvas on PaintX art gallery.`;
+  const isCanvasWord = name.toLowerCase() === "canvas";
+  const title = isCanvasWord ? "Canvas Paintings" : `${name} Canvas Paintings`;
+  const description = isCanvasWord
+    ? "Browse original paintings on canvas at PaintX, including available works with dimensions, pricing, and artist context."
+    : `Browse original paintings on ${name.toLowerCase()} canvas at PaintX, including available works with dimensions, pricing, and artist context.`;
   return {
     title,
     description,

@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { artists } = await fetchFacetNames();
   const name = artists.find((s) => slugifyFacet(s) === slug) || slug;
   const canonicalUrl = `https://www.paintx.art/artist/${slug}`;
-  const title = `${name} paintings | PaintX`;
-  const description = `Browse paintings by ${name} on PaintX art gallery.`;
+  const title = `${name} Original Paintings`;
+  const description = `Explore original paintings by ${name} at PaintX, including available works with pricing, dimensions, and artwork detail pages.`;
   return {
     title,
     description,
