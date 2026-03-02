@@ -1,0 +1,23 @@
+# PaintX Art Gallery
+
+> Canonical site: https://www.paintx.art
+> Purpose: Original paintings marketplace and gallery pages.
+
+## Preferred entry points
+- Home: https://www.paintx.art/
+- Artwork pages: https://www.paintx.art/art/[slug]
+- Artist pages: https://www.paintx.art/artist/[slug]
+- Style pages: https://www.paintx.art/style/[slug]
+- Medium pages: https://www.paintx.art/medium/[slug]
+- Canvas pages: https://www.paintx.art/canvas/[slug]
+
+## Sitemaps / crawling
+- Sitemap: https://www.paintx.art/sitemap.xml
+- Robots: https://www.paintx.art/robots.txt
+
+## Trust / contact
+- Contact intent: use on-page Contact CTA on artwork detail pages.
+
+## Content notes
+- Do not invent artist facts, provenance, awards, or pricing claims beyond page data.
+- Use page canonical URLs when citing artwork or artist information.
