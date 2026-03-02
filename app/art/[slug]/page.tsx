@@ -116,28 +116,60 @@ export default async function PaintingDetailPage({
   const availability = (p.availability || "available").toLowerCase().includes("sold")
     ? "https://schema.org/SoldOut"
     : "https://schema.org/InStock";
+  const conditionText = (p.condition || "").toLowerCase();
+  const itemCondition =
+    conditionText.includes("excellent") || conditionText.includes("new")
+      ? "https://schema.org/NewCondition"
+      : undefined;
+  const priceValidUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+  const offer =
+    p.price && p.price > 0
+      ? {
+          "@type": "Offer",
+          price: p.price,
+          priceCurrency: p.currency || "USD",
+          availability,
+          url: detailUrl,
+          priceValidUntil,
+          itemCondition,
+          seller: {
+            "@type": "Organization",
+            name: "PaintX Art Gallery",
+            url: "https://www.paintx.art",
+          },
+        }
+      : undefined;
+
   const artworkStructuredData = {
     "@context": "https://schema.org",
-    "@type": "VisualArtwork",
-    name: title,
-    url: detailUrl,
-    image: mid || undefined,
-    artform: p.style_name || undefined,
-    artMedium: p.medium_name || undefined,
-    width: p.canvas_width ? `${p.canvas_width} cm` : undefined,
-    height: p.canvas_height ? `${p.canvas_height} cm` : undefined,
-    artist: artistName ? { "@type": "Person", name: artistName } : undefined,
-    description: p.description || undefined,
-    offers:
-      p.price && p.price > 0
-        ? {
-            "@type": "Offer",
-            price: p.price,
-            priceCurrency: p.currency || "USD",
-            availability,
-            url: detailUrl,
-          }
-        : undefined,
+    "@graph": [
+      {
+        "@type": "VisualArtwork",
+        name: title,
+        url: detailUrl,
+        image: mid || undefined,
+        artform: p.style_name || undefined,
+        artMedium: p.medium_name || undefined,
+        width: p.canvas_width ? `${p.canvas_width} cm` : undefined,
+        height: p.canvas_height ? `${p.canvas_height} cm` : undefined,
+        artist: artistName ? { "@type": "Person", name: artistName } : undefined,
+        description: p.description || undefined,
+        offers: offer,
+      },
+      {
+        "@type": "Product",
+        name: title,
+        url: detailUrl,
+        image: mid || undefined,
+        description: p.description || undefined,
+        brand: {
+          "@type": "Brand",
+          name: "PaintX",
+        },
+        offers: offer,
+      },
+    ],
   };
 
   return (
