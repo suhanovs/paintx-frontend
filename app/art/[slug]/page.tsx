@@ -10,8 +10,6 @@ import {
 import PaintingScroller from "@/components/PaintingScroller";
 import DetailImage from "@/components/DetailImage";
 import BackButton from "@/components/BackButton";
-import ArtistPriceRange from "@/components/ArtistPriceRange";
-import ArtworkRating from "@/components/ArtworkRating";
 import DetailInquiryCta from "@/components/DetailInquiryCta";
 import { slugifyFacet } from "@/lib/facets";
 import type { PaintingDetail } from "@/types";
@@ -109,7 +107,6 @@ export default async function PaintingDetailPage({
   const price = formatPrice(p.price, p.currency || "USD", true);
   const title = p.title || "Untitled";
   const artistName = p.artist_name_en || p.artist_name;
-  const artistBio  = p.artist_about_en || p.artist_about;
   // Keep UUID for related endpoints
   const paintingId = String(p.id);
 
@@ -201,32 +198,20 @@ export default async function PaintingDetailPage({
           {/* Price */}
           <div className="text-xl font-semibold text-gray-200">{price}</div>
 
-          {/* Status + condition + one-line range */}
-          <div className="flex items-center gap-3 flex-wrap lg:flex-nowrap">
+          {/* Status + condition */}
+          <div className="flex items-center gap-3 flex-wrap">
             {p.availability && (
               <span className={DETAIL_PILL_CLASS}>{p.availability}</span>
             )}
             {p.condition && !UNKNOWN.includes(p.condition) && (
               <span className={DETAIL_PILL_CLASS}>{p.condition}</span>
             )}
-            <div className="flex-1 min-w-[180px] lg:min-w-[220px]">
-              <ArtistPriceRange
-                min={p.artist_min_price ?? 0}
-                max={p.artist_max_price ?? 0}
-                current={p.price ?? 0}
-                count={p.artist_works_count ?? 0}
-                currency={p.currency || "USD"}
-              />
-            </div>
           </div>
 
           {/* Description */}
           {p.description && (
             <p className="text-sm text-gray-300 leading-relaxed">{p.description}</p>
           )}
-
-          {/* Evaluation */}
-          {p.notes && <ArtworkRating notesRu={p.notes} />}
 
           {/* Attribute chips */}
           <div className="flex flex-wrap gap-2">
@@ -285,19 +270,6 @@ export default async function PaintingDetailPage({
                     {t}
                   </span>
                 ))}
-            </div>
-          )}
-
-          {/* Artist */}
-          {artistName && (
-            <div className="border-t border-gray-800 pt-4">
-              <p className="text-base font-semibold text-white mb-2">{artistName}</p>
-              {artistBio && (
-                <p
-                  className="text-sm text-gray-400 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: artistBio }}
-                />
-              )}
             </div>
           )}
 
