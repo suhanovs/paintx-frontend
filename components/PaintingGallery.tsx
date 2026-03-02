@@ -215,6 +215,13 @@ export default function PaintingGallery({
     [searchState],
   );
 
+  const footerLinks = [
+    { href: "/style/surrealism", label: "Browse surrealism paintings" },
+    { href: "/artist/alexei-yezhov", label: "Browse Alexei Yezhov paintings" },
+    { href: "/medium/oil", label: "Browse oil medium paintings" },
+    { href: "/canvas/canvas", label: "Browse canvas paintings" },
+  ];
+
   return (
     <div className="relative min-h-screen">
       <div className="w-full px-2 py-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
@@ -242,45 +249,60 @@ export default function PaintingGallery({
       )}
 
       {totalKnownPages > 1 && (
-        <div className="hidden lg:flex items-center justify-center gap-2 py-8 flex-wrap">
-          {page > 1 ? (
-            <Link
-              href={buildPageHref(page - 1)}
-              className="rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm"
-            >
-              Prev
-            </Link>
-          ) : (
-            <span className="rounded-full px-3 py-2 border border-gray-600 bg-gray-700/20 text-gray-500 text-sm">Prev</span>
-          )}
-
-          {visiblePages.map((pNum) => {
-            const active = pNum === page;
-            return (
+        <>
+          <div className="hidden lg:flex items-center justify-center gap-2 py-8 flex-wrap">
+            {page > 1 ? (
               <Link
-                key={pNum}
-                href={buildPageHref(pNum)}
-                aria-current={active ? "page" : undefined}
-                className={`rounded-full px-3 py-2 transition-colors border border-gray-600 text-sm ${
-                  active ? "bg-red-500/25 text-red-200" : "bg-gray-700/40 text-gray-300"
-                }`}
+                href={buildPageHref(page - 1)}
+                className="rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm"
               >
-                {pNum}
+                Prev
               </Link>
-            );
-          })}
+            ) : (
+              <span className="rounded-full px-3 py-2 border border-gray-600 bg-gray-700/20 text-gray-500 text-sm">Prev</span>
+            )}
 
-          {page < totalKnownPages ? (
-            <Link
-              href={buildPageHref(page + 1)}
-              className="rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm"
-            >
-              Next
-            </Link>
-          ) : (
-            <span className="rounded-full px-3 py-2 border border-gray-600 bg-gray-700/20 text-gray-500 text-sm">Next</span>
-          )}
-        </div>
+            {visiblePages.map((pNum) => {
+              const active = pNum === page;
+              return (
+                <Link
+                  key={pNum}
+                  href={buildPageHref(pNum)}
+                  aria-current={active ? "page" : undefined}
+                  className={`rounded-full px-3 py-2 transition-colors border border-gray-600 text-sm ${
+                    active ? "bg-red-500/25 text-red-200" : "bg-gray-700/40 text-gray-300"
+                  }`}
+                >
+                  {pNum}
+                </Link>
+              );
+            })}
+
+            {page < totalKnownPages ? (
+              <Link
+                href={buildPageHref(page + 1)}
+                className="rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm"
+              >
+                Next
+              </Link>
+            ) : (
+              <span className="rounded-full px-3 py-2 border border-gray-600 bg-gray-700/20 text-gray-500 text-sm">Next</span>
+            )}
+          </div>
+
+          <div className="hidden lg:flex items-center justify-center gap-3 pb-10 flex-wrap text-sm text-gray-400">
+            <span className="text-gray-500">Explore:</span>
+            {footerLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="hover:text-gray-200 underline underline-offset-4"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
