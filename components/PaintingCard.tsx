@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 import type { PaintingListItem } from "@/types";
 import { midUrl, fullUrl, formatPrice } from "@/lib/api";
@@ -21,8 +20,6 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLiked, setIsLiked] = useState(initiallyLiked);
     const [likesCount, setLikesCount] = useState<number>(painting.likes_count ?? 0);
-    const router = useRouter();
-    const mobileTapTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
       if (initiallyLiked) setIsLiked(true);
@@ -44,12 +41,6 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
     }, []);
     // Prefer slug for SEO-friendly URLs; fall back to UUID for unpublished/edge cases
     const href = `/art/${painting.slug || painting.id}`;
-
-    useEffect(() => {
-      return () => {
-        if (mobileTapTimeout.current) clearTimeout(mobileTapTimeout.current);
-      };
-    }, []);
 
     return (
       <>
@@ -103,15 +94,10 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
             alt={painting.title || painting.title_ru || "Painting"}
             className="w-full h-full object-cover aspect-square rounded-md sm:rounded-lg cursor-pointer select-none"
             onClick={() => {
-              if (isMobile) return;
-              setIsModalOpen(true);
+              if (!isMobile) setIsModalOpen(true);
             }}
-            onTouchEnd={() => {
-              if (!isMobile) return;
-              if (mobileTapTimeout.current) {
-                clearTimeout(mobileTapTimeout.current);
-                mobileTapTimeout.current = null;
-                if (isLiked) return;
+            onDoubleClick={() => {
+              if (isMobile && !isLiked) {
                 void fetch(`/api/paintings/${painting.id}/like`, {
                   method: "POST",
                   headers: { "x-visitor-cookie": getVisitorCookie() },
@@ -124,19 +110,6 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
                   .catch(() => undefined);
                 return;
               }
-
-              mobileTapTimeout.current = setTimeout(() => {
-                mobileTapTimeout.current = null;
-                sessionStorage.setItem("galleryScrollPos", window.scrollY.toString());
-                void fetch(`/api/paintings/${painting.id}/details-click`, {
-                  method: "POST",
-                  keepalive: true,
-                  headers: { "x-visitor-cookie": getVisitorCookie() },
-                }).catch(() => undefined);
-                router.push(href);
-              }, 260);
-            }}
-            onDoubleClick={() => {
               if (!isMobile) setIsLiked((v) => !v);
             }}
             onContextMenu={(e) => e.preventDefault()}
@@ -148,38 +121,17 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
           <div className="flex flex-col gap-2 px-1">
             {/* Title + artist */}
             <div className="flex items-start justify-between gap-1">
-              {isMobile ? (
-                <Link
-                  href={href}
-                  onClick={() => {
-                    sessionStorage.setItem("galleryScrollPos", window.scrollY.toString());
-                    void fetch(`/api/paintings/${painting.id}/details-click`, {
-                      method: "POST",
-                      keepalive: true,
-                      headers: { "x-visitor-cookie": getVisitorCookie() },
-                    }).catch(() => undefined);
-                  }}
-                  className="text-sm font-medium text-gray-300 leading-snug"
-                >
-                  {painting.title || painting.title_ru}
-                </Link>
-              ) : (
-                <h3 className="text-sm font-medium text-gray-300 leading-snug">
-                  {painting.title || painting.title_ru}
-                </h3>
-              )}
+              <h3 className="text-sm font-medium text-gray-300 leading-snug">
+                {painting.title || painting.title_ru}
+              </h3>
               {painting.artist_name && (
-                isMobile ? (
-                  <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">{painting.artist_name}</span>
-                ) : (
-                  <Link
-                    href={`/artist/${slugifyFacet(painting.artist_name)}`}
-                    className="inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200 whitespace-nowrap flex-shrink-0"
-                    aria-label={`Filter by artist ${painting.artist_name}`}
-                  >
-                    {painting.artist_name}
-                  </Link>
-                )
+                <Link
+                  href={`/artist/${slugifyFacet(painting.artist_name)}`}
+                  className="inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200 whitespace-nowrap flex-shrink-0"
+                  aria-label={`Filter by artist ${painting.artist_name}`}
+                >
+                  {painting.artist_name}
+                </Link>
               )}
             </div>
 
@@ -203,6 +155,13 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
 
             {/* Description */}
             {painting.description && (
+              <p className="text-sm text-gray-500 leading-snug line-clamp-2 mt-1">
+                {painting.description}
+              </p>
+            )}
+
+            {/* Details button */}
+            <div className="mt-2">
               <Link
                 href={href}
                 onClick={() => {
@@ -213,31 +172,12 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
                     headers: { "x-visitor-cookie": getVisitorCookie() },
                   }).catch(() => undefined);
                 }}
-                className="text-sm text-gray-500 leading-snug line-clamp-2 mt-1 block"
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm hover:bg-gray-700/60"
               >
-                {painting.description}
+                Details
+                <Icon icon="mdi:eye-outline" width={16} />
               </Link>
-            )}
-
-            {!isMobile && (
-              <div className="mt-2">
-                <Link
-                  href={href}
-                  onClick={() => {
-                    sessionStorage.setItem("galleryScrollPos", window.scrollY.toString());
-                    void fetch(`/api/paintings/${painting.id}/details-click`, {
-                      method: "POST",
-                      keepalive: true,
-                      headers: { "x-visitor-cookie": getVisitorCookie() },
-                    }).catch(() => undefined);
-                  }}
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm hover:bg-gray-700/60"
-                >
-                  Details
-                  <Icon icon="mdi:eye-outline" width={16} />
-                </Link>
-              </div>
-            )}
+            </div>
           </div>
         </div>
 
