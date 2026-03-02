@@ -5,17 +5,45 @@ import NavbarWrapper from "@/components/NavbarWrapper";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "Buy Original Paintings — Contemporary & Classical Art | PaintX Art Gallery",
-  description:
-    "Discover unique original paintings for your home. Works by established and emerging artists. Fall in love and buy fine art online at PaintX.",
-  alternates: {
-    canonical: "https://www.paintx.art",
-  },
-  openGraph: {
-    url: "https://www.paintx.art",
-  },
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const sp = (await searchParams) ?? {};
+  const pageRaw = Array.isArray(sp.page) ? sp.page[0] : sp.page;
+  const searchRaw = Array.isArray(sp.search) ? sp.search[0] : sp.search;
+  const statusRaw = Array.isArray(sp.status) ? sp.status[0] : sp.status;
+  const sortRaw = Array.isArray(sp.sort) ? sp.sort[0] : sp.sort;
+
+  const page = Math.max(1, Number.parseInt(pageRaw ?? "1", 10) || 1);
+  const hasSearch = Boolean((searchRaw ?? "").trim());
+  const hasFilter = hasSearch || statusRaw === "sold" || statusRaw === "all" || statusRaw === "liked" || sortRaw === "oldest";
+  const hasParams = hasFilter || page > 1;
+
+  return {
+    title: "Buy Original Paintings — Contemporary & Classical Art | PaintX Art Gallery",
+    description:
+      "Discover unique original paintings for your home. Works by established and emerging artists. Fall in love and buy fine art online at PaintX.",
+    alternates: {
+      canonical: "https://www.paintx.art",
+    },
+    robots: hasParams
+      ? {
+          index: false,
+          follow: true,
+          googleBot: { index: false, follow: true },
+        }
+      : {
+          index: true,
+          follow: true,
+          googleBot: { index: true, follow: true },
+        },
+    openGraph: {
+      url: "https://www.paintx.art",
+    },
+  };
+}
 
 export default async function GalleryPage({
   searchParams,
