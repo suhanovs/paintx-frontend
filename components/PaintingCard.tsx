@@ -46,7 +46,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
       <>
         <div
           ref={ref}
-          className="relative flex flex-col gap-3 p-1 sm:p-4 rounded-md transition-all ease-in-out sm:bg-gray-900/20"
+          className="relative flex flex-col gap-3 p-1 pb-4 sm:p-4 rounded-md transition-all ease-in-out sm:bg-gray-900/20"
           style={{ borderRadius: "10px", transition: "all 0.3s ease" }}
         >
           {/* Price badge — left-7 top-7 matches .ru */}
@@ -121,7 +121,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
           <div className="flex flex-col gap-2 px-1">
             {/* Title + artist */}
             <div className="flex items-start justify-between gap-1">
-              <h3 className="text-sm font-medium text-gray-300 leading-snug">
+              <h3 className="text-sm font-medium text-gray-400 sm:text-gray-300 leading-snug">
                 {painting.title || painting.title_ru}
               </h3>
               {painting.artist_name && (
@@ -165,7 +165,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
             )}
 
             {/* Details button */}
-            <div className="mt-3 sm:mt-2">
+            <div className="mt-1 sm:mt-2">
               <Link
                 href={href}
                 onClick={() => {
