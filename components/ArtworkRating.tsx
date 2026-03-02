@@ -67,7 +67,7 @@ export default function ArtworkRating({ notesRu }: { notesRu: string }) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap hover:bg-gray-600 transition-colors"
+          className="inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium whitespace-nowrap transition-colors hover:bg-gray-700/60 hover:text-gray-200"
           aria-expanded={open}
           aria-label="Toggle detailed artwork evaluation"
         >

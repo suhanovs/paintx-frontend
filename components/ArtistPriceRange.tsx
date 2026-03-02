@@ -16,7 +16,7 @@ export default function ArtistPriceRange({ min, max, current, count, currency = 
   const percent = ((clamped - min) / (max - min)) * 100;
 
   return (
-    <div className="inline-flex items-center gap-2 rounded-full bg-gray-700 text-white px-3 py-1 text-sm font-medium whitespace-nowrap max-w-full">
+    <div className="inline-flex items-center gap-2 rounded-full border border-gray-600 bg-gray-700/40 text-gray-300 px-3 py-1 text-xs font-medium whitespace-nowrap max-w-full">
       <span className="text-gray-200">{formatPrice(min, currency)}</span>
       <div className="relative w-20 h-1.5 rounded-full bg-gray-500/60 flex-shrink-0" aria-hidden>
         <div className="absolute inset-y-0 left-0 rounded-full bg-gray-200/90" style={{ width: `${percent}%` }} />

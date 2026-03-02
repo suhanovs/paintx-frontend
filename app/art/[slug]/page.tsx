@@ -84,7 +84,8 @@ export async function generateMetadata({
 }
 
 const UNKNOWN = ["Unknown", "Неизвестно", "Unknown style", "Неизвестный стиль", ""];
-const DETAIL_PILL_CLASS = "px-3 py-1 bg-gray-700 text-white rounded-full text-sm font-medium whitespace-nowrap";
+const DETAIL_PILL_CLASS = "inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium whitespace-nowrap";
+const DETAIL_PILL_LINK_CLASS = `${DETAIL_PILL_CLASS} transition-colors hover:bg-gray-700/60 hover:text-gray-200`;
 
 export default async function PaintingDetailPage({
   params,
@@ -230,14 +231,14 @@ export default async function PaintingDetailPage({
           {/* Attribute chips */}
           <div className="flex flex-wrap gap-2">
             {p.style_name && !UNKNOWN.includes(p.style_name) && (
-              <Link href={`/style/${slugifyFacet(p.style_name)}`} className={`${DETAIL_PILL_CLASS} hover:bg-gray-600 transition-colors`}>
+              <Link href={`/style/${slugifyFacet(p.style_name)}`} className={DETAIL_PILL_LINK_CLASS}>
                 {p.style_name}
               </Link>
             )}
             {p.medium_name && !UNKNOWN.includes(p.medium_name) && (
               <Link
                 href={`/medium/${slugifyFacet(p.medium_name)}`}
-                className={`${DETAIL_PILL_CLASS} hover:bg-gray-600 transition-colors`}
+                className={DETAIL_PILL_LINK_CLASS}
               >
                 {p.medium_name}
               </Link>
@@ -245,7 +246,7 @@ export default async function PaintingDetailPage({
             {p.canvas_name && !UNKNOWN.includes(p.canvas_name) && (
               <Link
                 href={`/canvas/${slugifyFacet(p.canvas_name)}`}
-                className={`${DETAIL_PILL_CLASS} hover:bg-gray-600 transition-colors`}
+                className={DETAIL_PILL_LINK_CLASS}
               >
                 {p.canvas_name}
               </Link>

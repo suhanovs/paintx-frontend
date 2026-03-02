@@ -106,7 +106,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               {painting.artist_name && (
                 <Link
                   href={`/artist/${slugifyFacet(painting.artist_name)}`}
-                  className="inline-flex items-center px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-medium hover:bg-gray-700 transition-colors whitespace-nowrap flex-shrink-0"
+                  className="inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200 whitespace-nowrap flex-shrink-0"
                   aria-label={`Filter by artist ${painting.artist_name}`}
                 >
                   {painting.artist_name}
@@ -119,14 +119,14 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               {painting.style_name && !UNKNOWN.includes(painting.style_name) && (
                 <Link
                   href={`/style/${slugifyFacet(painting.style_name)}`}
-                  className="inline-flex items-center px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-medium hover:bg-gray-700 transition-colors"
+                  className="inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200"
                   aria-label={`Filter by style ${painting.style_name}`}
                 >
                   {painting.style_name}
                 </Link>
               )}
               {painting.canvas_width && painting.canvas_height && (
-                <span className="inline-flex items-center px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-xs font-medium">
+                <span className="inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium">
                   {painting.canvas_width}×{painting.canvas_height} cm
                 </span>
               )}
