@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import type { PaintingListItem } from "@/types";
@@ -35,6 +35,10 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
 
     const mid  = midUrl(painting.image_mid_res_filename);
     const full = fullUrl(painting.image_mid_res_filename);
+    const isMobile = useMemo(() => {
+      if (typeof window === "undefined") return false;
+      return window.matchMedia("(max-width: 639px)").matches;
+    }, []);
     // Prefer slug for SEO-friendly URLs; fall back to UUID for unpublished/edge cases
     const href = `/art/${painting.slug || painting.id}`;
 
@@ -42,7 +46,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
       <>
         <div
           ref={ref}
-          className="relative flex flex-col gap-3 p-4 rounded-md transition-all ease-in-out sm:bg-gray-900/20"
+          className="relative flex flex-col gap-3 p-1 sm:p-4 rounded-md transition-all ease-in-out sm:bg-gray-900/20"
           style={{ borderRadius: "10px", transition: "all 0.3s ease" }}
         >
           {/* Price badge — left-7 top-7 matches .ru */}
@@ -88,9 +92,26 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
           <img
             src={mid}
             alt={painting.title || painting.title_ru || "Painting"}
-            className="w-full h-full object-cover aspect-square rounded-lg cursor-pointer select-none"
-            onClick={() => setIsModalOpen(true)}
-            onDoubleClick={() => setIsLiked((v) => !v)}
+            className="w-full h-full object-cover aspect-square rounded-md sm:rounded-lg cursor-pointer select-none"
+            onClick={() => {
+              if (!isMobile) setIsModalOpen(true);
+            }}
+            onDoubleClick={() => {
+              if (isMobile && !isLiked) {
+                void fetch(`/api/paintings/${painting.id}/like`, {
+                  method: "POST",
+                  headers: { "x-visitor-cookie": getVisitorCookie() },
+                })
+                  .then((res) => (res.ok ? res.json() : null))
+                  .then((data) => {
+                    if (data?.liked) setIsLiked(true);
+                    if (typeof data?.likes_count === "number") setLikesCount(data.likes_count);
+                  })
+                  .catch(() => undefined);
+                return;
+              }
+              if (!isMobile) setIsLiked((v) => !v);
+            }}
             onContextMenu={(e) => e.preventDefault()}
             draggable={false}
             loading="lazy"
@@ -119,14 +140,14 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               {painting.style_name && !UNKNOWN.includes(painting.style_name) && (
                 <Link
                   href={`/style/${slugifyFacet(painting.style_name)}`}
-                  className="inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200"
+                  className="hidden sm:inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200"
                   aria-label={`Filter by style ${painting.style_name}`}
                 >
                   {painting.style_name}
                 </Link>
               )}
               {painting.canvas_width && painting.canvas_height && (
-                <span className="inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium">
+                <span className="hidden sm:inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium">
                   {painting.canvas_width}×{painting.canvas_height} cm
                 </span>
               )}
