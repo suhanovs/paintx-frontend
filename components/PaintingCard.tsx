@@ -46,7 +46,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
       <>
         <div
           ref={ref}
-          className="relative flex flex-col gap-3 p-1 pb-4 sm:p-4 rounded-md transition-all ease-in-out sm:bg-gray-900/20"
+          className="relative flex flex-col gap-3 p-1 pb-7 sm:p-4 rounded-md transition-all ease-in-out sm:bg-gray-900/20"
           style={{ borderRadius: "10px", transition: "all 0.3s ease" }}
         >
           {/* Price badge — left-7 top-7 matches .ru */}
@@ -126,7 +126,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               </h3>
               {painting.artist_name && (
                 isMobile ? (
-                  <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">{painting.artist_name}</span>
+                  <span className="text-sm font-medium text-gray-400 leading-snug whitespace-nowrap flex-shrink-0">{painting.artist_name}</span>
                 ) : (
                   <Link
                     href={`/artist/${slugifyFacet(painting.artist_name)}`}

@@ -14,7 +14,7 @@ export default function DetailInquiryCta({ title, slug }: Props) {
   const pageUrl = `https://www.paintx.art/art/${slug}`;
   const prefills = `I'm interested in \"${title}\".\nPage: ${pageUrl}`;
 
-  const share = (platform: "facebook" | "x" | "instagram") => {
+  const share = async (platform: "facebook" | "x" | "instagram") => {
     const encodedUrl = encodeURIComponent(pageUrl);
     const encodedText = encodeURIComponent(`${title} — ${pageUrl}`);
 
@@ -28,7 +28,24 @@ export default function DetailInquiryCta({ title, slug }: Props) {
       return;
     }
 
-    // Instagram has no reliable web share endpoint; open profile as fallback.
+    // Instagram: no official web share URL for links.
+    // Use native share sheet when available; fallback to copy-link + open Instagram.
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text: title, url: pageUrl });
+        return;
+      } catch {
+        // continue to fallback
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(pageUrl);
+      alert("Link copied. Paste it in Instagram.");
+    } catch {
+      // ignore clipboard failures
+    }
+
     window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
   };
 
