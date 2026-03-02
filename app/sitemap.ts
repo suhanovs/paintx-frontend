@@ -8,8 +8,13 @@ const SITE_URL = "https://www.paintx.art";
 
 export const revalidate = 3600;
 
-async function fetchAllSlugs(): Promise<string[]> {
-  const slugs: string[] = [];
+type PaintingSitemapItem = {
+  slug: string;
+  image?: string;
+};
+
+async function fetchAllPaintingItems(): Promise<PaintingSitemapItem[]> {
+  const rows: PaintingSitemapItem[] = [];
   let page = 1;
   const limit = 100;
 
@@ -21,16 +26,25 @@ async function fetchAllSlugs(): Promise<string[]> {
     if (!res.ok) break;
 
     const data = await res.json();
-    const items = (data.items ?? []) as { slug?: string }[];
+    const items = (data.items ?? []) as {
+      slug?: string;
+      image_mid_res_filename?: string;
+    }[];
     for (const item of items) {
-      if (item.slug) slugs.push(item.slug);
+      if (!item.slug) continue;
+      rows.push({
+        slug: item.slug,
+        image: item.image_mid_res_filename
+          ? `https://images.paintx.art/mid/${item.image_mid_res_filename}`
+          : undefined,
+      });
     }
 
     if (page >= (data.pages ?? 1)) break;
     page++;
   }
 
-  return slugs;
+  return rows;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -51,12 +65,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let mediumRoutes: MetadataRoute.Sitemap = [];
   let canvasRoutes: MetadataRoute.Sitemap = [];
   try {
-    const slugs = await fetchAllSlugs();
-    paintingRoutes = slugs.map((slug) => ({
-      url: `${SITE_URL}/art/${slug}`,
+    const paintingItems = await fetchAllPaintingItems();
+    paintingRoutes = paintingItems.map((item) => ({
+      url: `${SITE_URL}/art/${item.slug}`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,
+      images: item.image ? [item.image] : undefined,
     }));
 
     const { styles, artists, mediums, canvases } = await fetchFacetNames();
