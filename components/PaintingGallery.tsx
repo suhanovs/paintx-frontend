@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { PaintingListItem } from "@/types";
 import PaintingCard from "./PaintingCard";
 import type { SearchState } from "./Navbar";
+import { slugifyFacet } from "@/lib/facets";
 
 interface PaintingGalleryProps {
   initialPaintings: PaintingListItem[];
@@ -215,12 +216,18 @@ export default function PaintingGallery({
     [searchState],
   );
 
-  const footerLinks = [
-    { href: "/style/surrealism", label: "Browse surrealism paintings" },
-    { href: "/artist/alexei-yezhov", label: "Browse Alexei Yezhov paintings" },
-    { href: "/medium/oil", label: "Browse oil medium paintings" },
-    { href: "/canvas/canvas", label: "Browse canvas paintings" },
-  ];
+  const footerLinks = useMemo(() => {
+    const pick = (values: Array<string | null | undefined>) => {
+      const v = values.find((x) => x && x.trim().length > 0);
+      return v ? v.trim() : null;
+    };
+    const style = pick(paintings.map((p) => p.style_name));
+    const artist = pick(paintings.map((p) => p.artist_name));
+    const links: Array<{ href: string; label: string }> = [];
+    if (style) links.push({ href: `/style/${slugifyFacet(style)}`, label: `Browse ${style} paintings` });
+    if (artist) links.push({ href: `/artist/${slugifyFacet(artist)}`, label: `Browse ${artist} paintings` });
+    return links;
+  }, [paintings]);
 
   return (
     <div className="relative min-h-screen">
@@ -249,60 +256,60 @@ export default function PaintingGallery({
       )}
 
       {totalKnownPages > 1 && (
-        <>
-          <div className="hidden lg:flex items-center justify-center gap-2 py-8 flex-wrap">
-            {page > 1 ? (
-              <Link
-                href={buildPageHref(page - 1)}
-                className="rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm"
-              >
-                Prev
-              </Link>
-            ) : (
-              <span className="rounded-full px-3 py-2 border border-gray-600 bg-gray-700/20 text-gray-500 text-sm">Prev</span>
-            )}
+        <div className="hidden lg:flex items-center justify-center gap-2 py-8 flex-wrap">
+          {page > 1 ? (
+            <Link
+              href={buildPageHref(page - 1)}
+              className="rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm"
+            >
+              Prev
+            </Link>
+          ) : (
+            <span className="rounded-full px-3 py-2 border border-gray-600 bg-gray-700/20 text-gray-500 text-sm">Prev</span>
+          )}
 
-            {visiblePages.map((pNum) => {
-              const active = pNum === page;
-              return (
-                <Link
-                  key={pNum}
-                  href={buildPageHref(pNum)}
-                  aria-current={active ? "page" : undefined}
-                  className={`rounded-full px-3 py-2 transition-colors border border-gray-600 text-sm ${
-                    active ? "bg-red-500/25 text-red-200" : "bg-gray-700/40 text-gray-300"
-                  }`}
-                >
-                  {pNum}
-                </Link>
-              );
-            })}
-
-            {page < totalKnownPages ? (
+          {visiblePages.map((pNum) => {
+            const active = pNum === page;
+            return (
               <Link
-                href={buildPageHref(page + 1)}
-                className="rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm"
+                key={pNum}
+                href={buildPageHref(pNum)}
+                aria-current={active ? "page" : undefined}
+                className={`rounded-full px-3 py-2 transition-colors border border-gray-600 text-sm ${
+                  active ? "bg-red-500/25 text-red-200" : "bg-gray-700/40 text-gray-300"
+                }`}
               >
-                Next
+                {pNum}
               </Link>
-            ) : (
-              <span className="rounded-full px-3 py-2 border border-gray-600 bg-gray-700/20 text-gray-500 text-sm">Next</span>
-            )}
-          </div>
+            );
+          })}
 
-          <div className="hidden lg:flex items-center justify-center gap-3 pb-10 flex-wrap text-sm text-gray-400">
-            <span className="text-gray-500">Explore:</span>
-            {footerLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="hover:text-gray-200 underline underline-offset-4"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </>
+          {page < totalKnownPages ? (
+            <Link
+              href={buildPageHref(page + 1)}
+              className="rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm"
+            >
+              Next
+            </Link>
+          ) : (
+            <span className="rounded-full px-3 py-2 border border-gray-600 bg-gray-700/20 text-gray-500 text-sm">Next</span>
+          )}
+        </div>
+      )}
+
+      {footerLinks.length > 0 && (
+        <div className="hidden lg:flex items-center justify-center gap-3 pb-10 flex-wrap text-sm text-gray-400">
+          <span className="text-gray-500">Explore:</span>
+          {footerLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="hover:text-gray-200 underline underline-offset-4"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
       )}
     </div>
   );
