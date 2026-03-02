@@ -84,7 +84,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               width={16}
               className={isLiked ? "text-red-400" : "text-gray-300"}
             />
-            {likesCount > 0 && <span className="text-[10px] text-gray-200">{likesCount}</span>}
+            {likesCount > 0 && <span className="text-xs text-gray-200">{likesCount}</span>}
           </button>
 
           {/* Image */}
@@ -130,7 +130,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
                 ) : (
                   <Link
                     href={`/artist/${slugifyFacet(painting.artist_name)}`}
-                    className="inline-flex items-center rounded-full px-3 sm:px-2.5 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs sm:text-sm font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200 whitespace-nowrap flex-shrink-0"
+                    className="text-sm font-medium text-gray-300 leading-snug whitespace-nowrap flex-shrink-0 transition-colors hover:text-white"
                     aria-label={`Filter by artist ${painting.artist_name}`}
                   >
                     {painting.artist_name}
@@ -139,8 +139,31 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               )}
             </div>
 
-            {/* Chips */}
-            <div className="flex items-start flex-wrap gap-2 mt-1">
+            {/* Description */}
+            {painting.description && (
+              <p className="text-sm text-gray-500 leading-snug line-clamp-2 mt-1">
+                {painting.description}
+              </p>
+            )}
+
+            {/* Details + desktop chips on same line */}
+            <div className="mt-1 sm:mt-2 flex items-start flex-wrap gap-2">
+              <Link
+                href={href}
+                onClick={() => {
+                  sessionStorage.setItem("galleryScrollPos", window.scrollY.toString());
+                  void fetch(`/api/paintings/${painting.id}/details-click`, {
+                    method: "POST",
+                    keepalive: true,
+                    headers: { "x-visitor-cookie": getVisitorCookie() },
+                  }).catch(() => undefined);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full px-3 sm:px-2.5 py-1 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-xs sm:text-sm font-medium hover:bg-gray-700/60"
+              >
+                Details
+                <Icon icon="mdi:eye-outline" width={16} />
+              </Link>
+
               {painting.style_name && !UNKNOWN.includes(painting.style_name) && (
                 <Link
                   href={`/style/${slugifyFacet(painting.style_name)}`}
@@ -155,32 +178,6 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
                   {painting.canvas_width}×{painting.canvas_height} cm
                 </span>
               )}
-            </div>
-
-            {/* Description */}
-            {painting.description && (
-              <p className="text-sm text-gray-500 leading-snug line-clamp-2 mt-1">
-                {painting.description}
-              </p>
-            )}
-
-            {/* Details button */}
-            <div className="mt-1 sm:mt-2">
-              <Link
-                href={href}
-                onClick={() => {
-                  sessionStorage.setItem("galleryScrollPos", window.scrollY.toString());
-                  void fetch(`/api/paintings/${painting.id}/details-click`, {
-                    method: "POST",
-                    keepalive: true,
-                    headers: { "x-visitor-cookie": getVisitorCookie() },
-                  }).catch(() => undefined);
-                }}
-                className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-sm hover:bg-gray-700/60"
-              >
-                Details
-                <Icon icon="mdi:eye-outline" width={16} />
-              </Link>
             </div>
           </div>
         </div>
