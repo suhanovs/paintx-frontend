@@ -14,7 +14,7 @@ export default function DetailInquiryCta({ title, slug }: Props) {
   const pageUrl = `https://www.paintx.art/art/${slug}`;
   const prefills = `I'm interested in \"${title}\".\nPage: ${pageUrl}`;
 
-  const share = async (platform: "facebook" | "x" | "instagram") => {
+  const share = async (platform: "facebook" | "x") => {
     const encodedUrl = encodeURIComponent(pageUrl);
     const encodedText = encodeURIComponent(`${title} — ${pageUrl}`);
 
@@ -28,22 +28,6 @@ export default function DetailInquiryCta({ title, slug }: Props) {
       return;
     }
 
-    // Instagram sharing reality:
-    // - No official URL supports prefilled DM text/link.
-    // - Best UX: copy link, try opening app DM inbox, then fallback to web DM.
-    try {
-      await navigator.clipboard.writeText(pageUrl);
-    } catch {
-      // ignore clipboard failures
-    }
-
-    // Try opening Instagram app inbox (works on many mobile setups)
-    window.location.href = "instagram://direct-inbox";
-
-    // Fallback to web DM/login if app deep link is unavailable
-    setTimeout(() => {
-      window.open("https://ig.me/m/", "_blank", "noopener,noreferrer");
-    }, 800);
   };
 
   return (
@@ -70,15 +54,6 @@ export default function DetailInquiryCta({ title, slug }: Props) {
           <Icon icon="mdi:facebook" width={18} height={18} />
         </button>
 
-        <button
-          type="button"
-          onClick={() => share("instagram")}
-          className="inline-flex items-center justify-center rounded-full w-10 h-10 border border-gray-600 bg-gray-700/40 text-gray-300 text-sm transition-colors hover:bg-gray-700/60"
-          aria-label="Share on Instagram"
-          title="Share on Instagram"
-        >
-          <Icon icon="mdi:instagram" width={18} height={18} />
-        </button>
 
         <button
           type="button"
