@@ -112,6 +112,34 @@ export default async function PaintingDetailPage({
   // Keep UUID for related endpoints
   const paintingId = String(p.id);
 
+  const detailUrl = `https://www.paintx.art/art/${slug}`;
+  const availability = (p.availability || "available").toLowerCase().includes("sold")
+    ? "https://schema.org/SoldOut"
+    : "https://schema.org/InStock";
+  const artworkStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "VisualArtwork",
+    name: title,
+    url: detailUrl,
+    image: mid || undefined,
+    artform: p.style_name || undefined,
+    artMedium: p.medium_name || undefined,
+    width: p.canvas_width ? `${p.canvas_width} cm` : undefined,
+    height: p.canvas_height ? `${p.canvas_height} cm` : undefined,
+    artist: artistName ? { "@type": "Person", name: artistName } : undefined,
+    description: p.description || undefined,
+    offers:
+      p.price && p.price > 0
+        ? {
+            "@type": "Offer",
+            price: p.price,
+            priceCurrency: p.currency || "USD",
+            availability,
+            url: detailUrl,
+          }
+        : undefined,
+  };
+
   return (
     <div className="relative min-h-screen bg-black text-white">
       {/* Floating back button */}
@@ -120,6 +148,10 @@ export default async function PaintingDetailPage({
       </div>
 
       <div className="pt-20 pb-3 w-full">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(artworkStructuredData) }}
+        />
         <div className="flex flex-col lg:flex-row gap-3">
           {/* Left: Main image only */}
           <div className="lg:w-[65%] px-[20px]">

@@ -39,10 +39,39 @@ export default async function GalleryPage({
 
   const data = await fetchPaintingsServer(page, search || undefined, 30, status, sort);
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://www.paintx.art/#organization",
+        name: "PaintX Art Gallery",
+        url: "https://www.paintx.art",
+        logo: "https://www.paintx.art/logo.jpg",
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://www.paintx.art/#website",
+        url: "https://www.paintx.art",
+        name: "PaintX Art Gallery",
+        publisher: { "@id": "https://www.paintx.art/#organization" },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: "https://www.paintx.art/?search={search_term_string}",
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
+  };
+
   return (
     <>
       <NavbarWrapper />
       <main>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <PaintingGallery
           initialPaintings={data.items}
           initialPage={page}

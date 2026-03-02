@@ -45,10 +45,31 @@ export default async function StylePage({ params, searchParams }: {
   const query = `"${styleName}"`;
   const data = await fetchPaintingsServer(page, query, 30, "available", "newest");
 
+  const listItems = (data.items || []).slice(0, 20).map((item: { title?: string; title_ru?: string; slug?: string }, idx: number) => ({
+    "@type": "ListItem",
+    position: idx + 1,
+    name: item.title || item.title_ru || "Painting",
+    url: item.slug ? `https://www.paintx.art/art/${item.slug}` : undefined,
+  }));
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `${styleName} paintings`,
+    url: `https://www.paintx.art/style/${slug}`,
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: listItems,
+    },
+  };
+
   return (
     <>
       <NavbarWrapper initialState={{ query, status: "available", sort: "newest" }} />
       <main>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <PaintingGallery
           initialPaintings={data.items}
           initialPage={page}
