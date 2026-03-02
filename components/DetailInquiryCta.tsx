@@ -28,8 +28,22 @@ export default function DetailInquiryCta({ title, slug }: Props) {
       return;
     }
 
-    // Instagram: always go directly to DM interface.
-    window.open("https://ig.me/m/", "_blank", "noopener,noreferrer");
+    // Instagram sharing reality:
+    // - No official URL supports prefilled DM text/link.
+    // - Best UX: copy link, try opening app DM inbox, then fallback to web DM.
+    try {
+      await navigator.clipboard.writeText(pageUrl);
+    } catch {
+      // ignore clipboard failures
+    }
+
+    // Try opening Instagram app inbox (works on many mobile setups)
+    window.location.href = "instagram://direct-inbox";
+
+    // Fallback to web DM/login if app deep link is unavailable
+    setTimeout(() => {
+      window.open("https://ig.me/m/", "_blank", "noopener,noreferrer");
+    }, 800);
   };
 
   return (
