@@ -16,10 +16,27 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const { canvases } = await fetchFacetNames();
   const name = canvases.find((c) => slugifyFacet(c) === slug) || slug;
+  const canonicalUrl = `https://www.paintx.art/canvas/${slug}`;
+  const title = `${name} paintings | PaintX`;
+  const description = `Browse paintings on ${name} canvas on PaintX art gallery.`;
   return {
-    title: `${name} paintings | PaintX`,
-    description: `Browse paintings on ${name} canvas on PaintX art gallery.`,
-    alternates: { canonical: `https://www.paintx.art/canvas/${slug}` },
+    title,
+    description,
+    alternates: { canonical: canonicalUrl },
+    openGraph: {
+      type: "website",
+      url: canonicalUrl,
+      title,
+      description,
+      siteName: "PaintX Art Gallery",
+      images: [{ url: "/logo.jpg", width: 1200, height: 630, alt: `${name} paintings` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/logo.jpg"],
+    },
   };
 }
 
