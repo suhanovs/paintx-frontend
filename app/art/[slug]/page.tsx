@@ -209,7 +209,7 @@ export default async function PaintingDetailPage({
             {p.condition && !UNKNOWN.includes(p.condition) && (
               <span className={DETAIL_PILL_CLASS}>{p.condition}</span>
             )}
-            <div className="flex-1 min-w-[180px] lg:min-w-[220px]">
+            <div className="hidden sm:block flex-1 min-w-[180px] lg:min-w-[220px]">
               <ArtistPriceRange
                 min={p.artist_min_price ?? 0}
                 max={p.artist_max_price ?? 0}
@@ -226,7 +226,11 @@ export default async function PaintingDetailPage({
           )}
 
           {/* Evaluation */}
-          {p.notes && <ArtworkRating notesRu={p.notes} />}
+          {p.notes && (
+            <div className="hidden sm:block">
+              <ArtworkRating notesRu={p.notes} />
+            </div>
+          )}
 
           {/* Attribute chips */}
           <div className="flex flex-wrap gap-2">
@@ -290,7 +294,7 @@ export default async function PaintingDetailPage({
 
           {/* Artist */}
           {artistName && (
-            <div className="border-t border-gray-800 pt-4">
+            <div className="hidden sm:block border-t border-gray-800 pt-4">
               <p className="text-base font-semibold text-white mb-2">{artistName}</p>
               {artistBio && (
                 <p

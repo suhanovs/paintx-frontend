@@ -125,13 +125,17 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
                 {painting.title || painting.title_ru}
               </h3>
               {painting.artist_name && (
-                <Link
-                  href={`/artist/${slugifyFacet(painting.artist_name)}`}
-                  className="inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200 whitespace-nowrap flex-shrink-0"
-                  aria-label={`Filter by artist ${painting.artist_name}`}
-                >
-                  {painting.artist_name}
-                </Link>
+                isMobile ? (
+                  <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">{painting.artist_name}</span>
+                ) : (
+                  <Link
+                    href={`/artist/${slugifyFacet(painting.artist_name)}`}
+                    className="inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200 whitespace-nowrap flex-shrink-0"
+                    aria-label={`Filter by artist ${painting.artist_name}`}
+                  >
+                    {painting.artist_name}
+                  </Link>
+                )
               )}
             </div>
 
@@ -161,7 +165,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
             )}
 
             {/* Details button */}
-            <div className="mt-2">
+            <div className="mt-3 sm:mt-2">
               <Link
                 href={href}
                 onClick={() => {
