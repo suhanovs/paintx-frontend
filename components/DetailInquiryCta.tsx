@@ -28,25 +28,8 @@ export default function DetailInquiryCta({ title, slug }: Props) {
       return;
     }
 
-    // Instagram: no official web share URL for links.
-    // Use native share sheet when available; fallback to copy-link + open Instagram.
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, text: title, url: pageUrl });
-        return;
-      } catch {
-        // continue to fallback
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(pageUrl);
-      alert("Link copied. Paste it in Instagram.");
-    } catch {
-      // ignore clipboard failures
-    }
-
-    window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
+    // Instagram: always go directly to DM interface.
+    window.open("https://ig.me/m/", "_blank", "noopener,noreferrer");
   };
 
   return (
