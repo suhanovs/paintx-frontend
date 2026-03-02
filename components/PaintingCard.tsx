@@ -130,7 +130,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
                 ) : (
                   <Link
                     href={`/artist/${slugifyFacet(painting.artist_name)}`}
-                    className="inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200 whitespace-nowrap flex-shrink-0"
+                    className="inline-flex items-center rounded-full px-3 sm:px-2.5 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs sm:text-sm font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200 whitespace-nowrap flex-shrink-0"
                     aria-label={`Filter by artist ${painting.artist_name}`}
                   >
                     {painting.artist_name}
@@ -144,14 +144,14 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
               {painting.style_name && !UNKNOWN.includes(painting.style_name) && (
                 <Link
                   href={`/style/${slugifyFacet(painting.style_name)}`}
-                  className="hidden sm:inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200"
+                  className="hidden sm:inline-flex items-center rounded-full px-3 sm:px-2.5 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs sm:text-sm font-medium transition-colors hover:bg-gray-700/60 hover:text-gray-200"
                   aria-label={`Filter by style ${painting.style_name}`}
                 >
                   {painting.style_name}
                 </Link>
               )}
               {painting.canvas_width && painting.canvas_height && (
-                <span className="hidden sm:inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium">
+                <span className="hidden sm:inline-flex items-center rounded-full px-3 sm:px-2.5 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs sm:text-sm font-medium">
                   {painting.canvas_width}×{painting.canvas_height} cm
                 </span>
               )}
