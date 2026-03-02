@@ -187,7 +187,7 @@ export default async function PaintingDetailPage({
         />
         <div className="flex flex-col lg:flex-row gap-3">
           {/* Left: Main image only */}
-          <div className="lg:w-[65%] px-[20px]">
+          <div className="lg:w-[65%] px-0 lg:px-[20px]">
             <DetailImage mid={mid} full={full} alt={title} />
           </div>
 

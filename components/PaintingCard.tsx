@@ -51,7 +51,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
         >
           {/* Price badge — left-7 top-7 matches .ru */}
           {painting.price && painting.price > 0 && (
-            <div className="absolute left-7 top-7 z-20 inline-flex h-7 items-center rounded-md bg-gray-800/60 px-2">
+            <div className="absolute left-2 top-2 sm:left-7 sm:top-7 z-20 inline-flex h-7 items-center rounded-md bg-gray-800/60 px-2">
               <span className="text-xs font-medium leading-none text-white">
                 {formatPrice(painting.price, painting.currency || "USD")}
               </span>
@@ -77,7 +77,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
                 // no-op
               }
             }}
-            className="absolute right-7 top-7 z-20 flex items-center justify-center min-w-7 h-7 px-1 rounded-full bg-gray-900/50 backdrop-blur-sm hover:bg-gray-900/70 transition-colors gap-1"
+            className="absolute right-2 top-2 sm:right-7 sm:top-7 z-20 flex items-center justify-center min-w-7 h-7 px-1 rounded-full bg-gray-900/50 backdrop-blur-sm hover:bg-gray-900/70 transition-colors gap-1"
           >
             <Icon
               icon="solar:heart-bold"
