@@ -84,7 +84,7 @@ export async function generateMetadata({
 }
 
 const UNKNOWN = ["Unknown", "Неизвестно", "Unknown style", "Неизвестный стиль", ""];
-const DETAIL_PILL_CLASS = "inline-flex items-center rounded-full px-3 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs font-medium whitespace-nowrap";
+const DETAIL_PILL_CLASS = "inline-flex items-center rounded-full px-3 lg:px-2.5 py-1 border border-gray-600 bg-gray-700/40 text-gray-300 text-xs lg:text-sm font-medium whitespace-nowrap";
 const DETAIL_PILL_LINK_CLASS = `${DETAIL_PILL_CLASS} transition-colors hover:bg-gray-700/60 hover:text-gray-200`;
 
 export default async function PaintingDetailPage({
@@ -110,6 +110,12 @@ export default async function PaintingDetailPage({
   const title = p.title || "Untitled";
   const artistName = p.artist_name_en || p.artist_name;
   const artistBio  = p.artist_about_en || p.artist_about;
+  const artistBioPlain = (artistBio || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const showArtistSection = Boolean(artistName && artistBioPlain);
   // Keep UUID for related endpoints
   const paintingId = String(p.id);
 
@@ -293,15 +299,13 @@ export default async function PaintingDetailPage({
           )}
 
           {/* Artist */}
-          {artistName && (
+          {showArtistSection && (
             <div className="hidden sm:block border-t border-gray-800 pt-4">
               <p className="text-base font-semibold text-white mb-2">{artistName}</p>
-              {artistBio && (
-                <p
-                  className="text-sm text-gray-400 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: artistBio }}
-                />
-              )}
+              <p
+                className="text-sm text-gray-400 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: artistBio! }}
+              />
             </div>
           )}
 
