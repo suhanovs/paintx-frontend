@@ -15,6 +15,7 @@ export interface SearchState {
   status: SearchStatus;
   sort: SortOrder;
   minPrice?: number;
+  strategy?: "top_sellers_available" | "author_top_25" | "author_bottom_25";
 }
 
 interface NavbarProps {

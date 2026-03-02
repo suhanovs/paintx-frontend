@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import type { PaintingListItem } from "@/types";
 import PaintingCard from "./PaintingCard";
 import type { SearchState } from "./Navbar";
-import { slugifyFacet } from "@/lib/facets";
 
 interface PaintingGalleryProps {
   initialPaintings: PaintingListItem[];
@@ -55,6 +54,7 @@ export default function PaintingGallery({
       if (detail.status !== "available") params.set("status", detail.status);
       if (detail.sort !== "newest") params.set("sort", detail.sort);
       if (typeof detail.minPrice === "number") params.set("min_price", String(detail.minPrice));
+      if (detail.strategy) params.set("strategy", detail.strategy);
       router.replace(`/?${params.toString()}`, { scroll: false });
     };
     window.addEventListener("paintx:search", handler);
@@ -115,6 +115,8 @@ export default function PaintingGallery({
       sessionStorage.setItem("gallerySort", searchState.sort);
       if (typeof searchState.minPrice === "number") sessionStorage.setItem("galleryMinPrice", String(searchState.minPrice));
       else sessionStorage.removeItem("galleryMinPrice");
+      if (searchState.strategy) sessionStorage.setItem("galleryStrategy", searchState.strategy);
+      else sessionStorage.removeItem("galleryStrategy");
     } catch {}
   }, [paintings, page, hasMore, searchState]);
 
@@ -133,10 +135,15 @@ export default function PaintingGallery({
         const restoredSort = (sessionStorage.getItem("gallerySort") ?? "newest") as SearchState["sort"];
         const restoredMinPriceRaw = sessionStorage.getItem("galleryMinPrice");
         const restoredMinPrice = restoredMinPriceRaw ? Number.parseInt(restoredMinPriceRaw, 10) : undefined;
+        const restoredStrategyRaw = sessionStorage.getItem("galleryStrategy");
+        const restoredStrategy =
+          restoredStrategyRaw === "top_sellers_available" || restoredStrategyRaw === "author_top_25" || restoredStrategyRaw === "author_bottom_25"
+            ? restoredStrategyRaw
+            : undefined;
         setPaintings(restoredPaintings);
         setPage(restoredPage);
         setHasMore(restoredHasMore);
-        setSearchState({ query: restoredSearch, status: restoredStatus, sort: restoredSort, minPrice: Number.isFinite(restoredMinPrice as number) ? restoredMinPrice : undefined });
+        setSearchState({ query: restoredSearch, status: restoredStatus, sort: restoredSort, minPrice: Number.isFinite(restoredMinPrice as number) ? restoredMinPrice : undefined, strategy: restoredStrategy });
         isFetching.current = false;
       } catch {}
     }
@@ -159,6 +166,7 @@ export default function PaintingGallery({
       params.set("status", state.status);
       params.set("sort", state.sort);
       if (typeof state.minPrice === "number") params.set("min_price", String(state.minPrice));
+      if (state.strategy) params.set("strategy", state.strategy);
 
       const res = await fetch(`/api/paintings?${params}`, {
         headers: { "x-visitor-cookie": getVisitorCookie() },
@@ -217,28 +225,24 @@ export default function PaintingGallery({
       if (searchState.status !== "available") params.set("status", searchState.status);
       if (searchState.sort !== "newest") params.set("sort", searchState.sort);
       if (typeof searchState.minPrice === "number") params.set("min_price", String(searchState.minPrice));
+      if (searchState.strategy) params.set("strategy", searchState.strategy);
       const q = params.toString();
       return q ? `/?${q}` : "/";
     },
     [searchState],
   );
 
-  const footerLinks = useMemo(() => {
-    const pick = (values: Array<string | null | undefined>) => {
-      const v = values.find((x) => x && x.trim().length > 0);
-      return v ? v.trim() : null;
-    };
-    const style = pick(paintings.map((p) => p.style_name));
-    const artist = pick(paintings.map((p) => p.artist_name));
-    const links: Array<{ href: string; label: string }> = [];
-    if (style) links.push({ href: `/style/${slugifyFacet(style)}`, label: `Browse ${style} paintings` });
-    if (artist) links.push({ href: `/artist/${slugifyFacet(artist)}`, label: `Browse ${artist} paintings` });
-    links.push({ href: "/?status=available&sort=price_desc&min_price=1000", label: "Browse paintings over $1,000 (highest first)" });
-    links.push({ href: "/?status=available&sort=year_asc", label: "Browse oldest paintings by year" });
-    links.push({ href: "/?status=available&sort=listing_oldest", label: "Browse longest-listed paintings" });
-    links.push({ href: "/?status=sold&sort=newest", label: "Browse recently sold paintings" });
-    return links;
-  }, [paintings]);
+  const footerLinks = useMemo(
+    () => [
+      { href: "/?strategy=top_sellers_available", label: "Top 3 best-selling authors — available works" },
+      { href: "/?strategy=author_top_25", label: "Premium picks: top 25% priced works per author" },
+      { href: "/?strategy=author_bottom_25", label: "Undervalued picks: bottom 25% priced works per author" },
+      { href: "/?status=available&sort=price_desc&min_price=1000", label: "Browse paintings over $1,000 (highest first)" },
+      { href: "/?status=available&sort=year_asc", label: "Browse oldest paintings by year" },
+      { href: "/?status=available&sort=listing_oldest", label: "Browse longest-listed paintings" },
+    ],
+    [],
+  );
 
   return (
     <div className="relative min-h-screen">
