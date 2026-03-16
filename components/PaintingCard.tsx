@@ -35,10 +35,18 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
 
     const mid  = midUrl(painting.image_mid_res_filename);
     const full = fullUrl(painting.image_mid_res_filename);
+    const isRu = useMemo(() => {
+      if (typeof window === "undefined") return false;
+      return window.location.hostname.includes(".ru");
+    }, []);
     const isMobile = useMemo(() => {
       if (typeof window === "undefined") return false;
       return window.matchMedia("(max-width: 639px)").matches;
     }, []);
+    const ruPrice = (painting as any).price_ru as number | undefined;
+    const ruCurrency = (painting as any).currency_ru as string | undefined;
+    const displayPrice = isRu && typeof ruPrice === "number" ? ruPrice : painting.price;
+    const displayCurrency = isRu ? (ruCurrency || painting.currency || "RUR") : (painting.currency || "USD");
     // Prefer slug for SEO-friendly URLs; fall back to UUID for unpublished/edge cases
     const href = `/art/${painting.slug || painting.id}`;
 
@@ -50,10 +58,10 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
           style={{ borderRadius: "10px", transition: "all 0.3s ease" }}
         >
           {/* Price badge — left-7 top-7 matches .ru */}
-          {painting.price && painting.price > 0 && (
+          {displayPrice && displayPrice > 0 && (
             <div className="absolute left-2 top-2 sm:left-7 sm:top-7 z-20 inline-flex h-7 items-center rounded-md bg-gray-800/60 px-2">
               <span className="text-xs font-medium leading-none text-white">
-                {formatPrice(painting.price, painting.currency || "USD")}
+                {formatPrice(displayPrice, displayCurrency)}
               </span>
             </div>
           )}
@@ -122,7 +130,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
             {/* Title + artist */}
             <div className="flex items-start justify-between gap-1">
               <h3 className="text-sm font-medium text-gray-400 sm:text-gray-300 leading-snug">
-                {painting.title || painting.title_ru}
+                {isRu ? (painting.title_ru || painting.title) : (painting.title || painting.title_ru)}
               </h3>
               {painting.artist_name && (
                 isMobile ? (
@@ -142,11 +150,11 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
             {/* Description */}
             {painting.description && (
               <p className="text-sm text-gray-500 leading-snug line-clamp-2 mt-1">
-                {painting.description}
+                {isRu ? ((painting as any).description_ru || painting.description) : painting.description}
               </p>
             )}
 
-            {/* Details + desktop chips on same line */}
+            {/* {isRu ? "Подробнее" : "Details"} + desktop chips on same line */}
             <div className="mt-1 sm:mt-2 flex items-start flex-wrap gap-2">
               <Link
                 href={href}
@@ -160,7 +168,7 @@ const PaintingCard = React.forwardRef<HTMLDivElement, PaintingCardProps>(
                 }}
                 className="inline-flex items-center gap-1.5 rounded-full px-3 sm:px-2.5 py-1 transition-colors border border-gray-600 bg-gray-700/40 text-gray-300 text-xs sm:text-sm font-medium hover:bg-gray-700/60"
               >
-                Details
+                {isRu ? "Подробнее" : "Details"}
                 <Icon icon="mdi:eye-outline" width={16} />
               </Link>
 
