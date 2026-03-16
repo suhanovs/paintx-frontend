@@ -191,6 +191,16 @@ export default function PaintingGallery({
     }
   }, [searchState, paintings.length, hasMore, fetchMore]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    const qp = Number.parseInt(url.searchParams.get("page") ?? "1", 10);
+    const targetPage = Number.isFinite(qp) && qp > 1 ? qp : 1;
+    if (targetPage <= page) return;
+    if (isFetching.current) return;
+    void fetchMore(targetPage, searchState, false);
+  }, [page, searchState, fetchMore]);
+
   const setLastCardRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (observer.current) observer.current.disconnect();
