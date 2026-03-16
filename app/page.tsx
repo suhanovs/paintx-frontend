@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { fetchPaintingsServer } from "@/lib/api";
 import PaintingGallery from "@/components/PaintingGallery";
 import NavbarWrapper from "@/components/NavbarWrapper";
+import { variantFromHost } from "@/lib/siteVariant";
 
 export const revalidate = 60;
 
@@ -81,7 +83,10 @@ export default async function GalleryPage({
     ? strategyRaw
     : undefined;
 
-  const data = await fetchPaintingsServer(page, search || undefined, 30, status, sort, minPrice, strategy);
+  const hdrs = await headers();
+  const host = hdrs.get("x-forwarded-host") || hdrs.get("host");
+  const variant = variantFromHost(host);
+  const data = await fetchPaintingsServer(page, search || undefined, 30, status, sort, minPrice, strategy, variant);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -110,7 +115,7 @@ export default async function GalleryPage({
 
   return (
     <>
-      <NavbarWrapper />
+      <NavbarWrapper variant={variant} />
       <main>
         <script
           type="application/ld+json"

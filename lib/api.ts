@@ -23,8 +23,9 @@ export function formatPrice(
   if (!price || price <= 0) return "Price on request";
   const code = (currency || "USD").toUpperCase();
   const cur = code === "RUR" ? "RUB" : code;
+  const locale = cur === "RUB" ? "ru-RU" : "en-US";
   try {
-    const formatted = new Intl.NumberFormat("en-US", {
+    const formatted = new Intl.NumberFormat(locale, {
       style: "currency",
       currency: cur,
       minimumFractionDigits: 0,
@@ -47,6 +48,7 @@ export async function fetchPaintingsServer(
   sort: "newest" | "oldest" | "price_desc" | "price_asc" | "year_asc" | "year_desc" | "listing_oldest" = "newest",
   minPrice?: number,
   strategy?: "top_sellers_available" | "author_top_25" | "author_bottom_25",
+  acceptLanguage?: "en" | "ru",
 ) {
   const params = new URLSearchParams({ page: String(page), limit: String(limit), status, sort });
   if (search) params.set("search", search);
@@ -54,6 +56,7 @@ export async function fetchPaintingsServer(
   if (strategy) params.set("strategy", strategy);
   const res = await fetch(`${INTERNAL_API_URL}/api/paintings?${params}`, {
     next: { revalidate: 60 },
+    headers: acceptLanguage ? { "Accept-Language": acceptLanguage } : undefined,
   });
   if (!res.ok) throw new Error("Failed to fetch paintings");
   return res.json();

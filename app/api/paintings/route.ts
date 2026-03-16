@@ -9,10 +9,13 @@ export async function GET(request: NextRequest) {
     request.headers.get("x-visitor-cookie") ||
     request.cookies.get("paintx_vid")?.value ||
     decodeURIComponent((rawCookie.match(/(?:^|;\s*)paintx_vid=([^;]+)/)?.[1] ?? ""));
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || "";
+  const lang = host.includes(".ru") ? "ru" : request.headers.get("accept-language") || "en";
   const res = await fetch(`${API}/api/paintings${search}`, {
     headers: {
       "Content-Type": "application/json",
       "x-visitor-cookie": visitorCookie,
+      "Accept-Language": lang,
     },
   });
   const data = await res.json();

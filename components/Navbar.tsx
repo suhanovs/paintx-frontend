@@ -21,9 +21,10 @@ export interface SearchState {
 interface NavbarProps {
   onSearch?: (state: SearchState) => void;
   initialState?: SearchState;
+  variant?: "en" | "ru";
 }
 
-export default function Navbar({ onSearch, initialState }: NavbarProps) {
+export default function Navbar({ onSearch, initialState, variant = "en" }: NavbarProps) {
   const [searchTerm, setSearchTerm] = useState(initialState?.query ?? "");
   const [status, setStatus] = useState<SearchStatus>(initialState?.status ?? "available");
   const [sort, setSort] = useState<SortOrder>(initialState?.sort ?? "newest");
@@ -82,10 +83,10 @@ export default function Navbar({ onSearch, initialState }: NavbarProps) {
             <div className="pointer-events-auto w-full max-w-4xl flex items-center gap-2">
               <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap">
                 {([
-                  ["available", "Available"],
-                  ["sold", "Sold"],
-                  ["all", "All"],
-                  ["liked", "Liked"],
+                  ["available", variant === "ru" ? "В наличии" : "Available"],
+                  ["sold", variant === "ru" ? "Продано" : "Sold"],
+                  ["all", variant === "ru" ? "Все" : "All"],
+                  ["liked", variant === "ru" ? "Избранное" : "Liked"],
                 ] as const).map(([value, label]) => {
                   const active = status === value;
                   return (
@@ -109,8 +110,8 @@ export default function Navbar({ onSearch, initialState }: NavbarProps) {
 
               <div className="inline-flex h-11 items-center rounded-full border border-gray-600 bg-gray-700/40 p-0.5 text-sm whitespace-nowrap">
                 {([
-                  ["newest", "Newest first"],
-                  ["oldest", "Oldest first"],
+                  ["newest", variant === "ru" ? "Сначала новые" : "Newest first"],
+                  ["oldest", variant === "ru" ? "Сначала старые" : "Oldest first"],
                 ] as const).map(([value, label]) => {
                   const active = sort === value;
                   return (
@@ -141,7 +142,7 @@ export default function Navbar({ onSearch, initialState }: NavbarProps) {
                   />
                   <input
                     type="text"
-                    placeholder="Description, artist, style..."
+                    placeholder={variant === "ru" ? "Описание, художник, стиль..." : "Description, artist, style..."}
                     value={searchTerm}
                     onChange={handleInputChange}
                     className="bg-transparent text-white placeholder-gray-400 focus:placeholder-transparent outline-none flex-1 text-sm"
