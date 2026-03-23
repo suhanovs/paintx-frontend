@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { fetchFacetNames, slugifyFacet } from "@/lib/facets";
+import { midUrl } from "@/lib/api";
 
 const INTERNAL_API_URL =
   process.env.INTERNAL_API_URL || "http://localhost:8000";
@@ -34,9 +35,7 @@ async function fetchAllPaintingItems(): Promise<PaintingSitemapItem[]> {
       if (!item.slug) continue;
       rows.push({
         slug: item.slug,
-        image: item.image_mid_res_filename
-          ? `https://images.paintx.art/mid/${item.image_mid_res_filename}`
-          : undefined,
+        image: midUrl(item.image_mid_res_filename),
       });
     }
 

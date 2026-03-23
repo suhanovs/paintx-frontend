@@ -1,18 +1,34 @@
 export const IMAGE_BASE_URL = "https://images.paintx.art";
 
+function normalizeImageKey(value: string | null | undefined): string {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+
+  // If backend already sent an absolute URL, use it directly.
+  if (/^https?:\/\//i.test(raw)) return raw;
+
+  let key = raw.replace(/^\/+/, "");
+  key = key.replace(/^(thumb|mid|img|hd)\//i, "");
+  return key;
+}
+
+function buildTierUrl(tier: "thumb" | "mid" | "img" | "hd", filename: string | null | undefined): string {
+  const normalized = normalizeImageKey(filename);
+  if (!normalized) return "";
+  if (/^https?:\/\//i.test(normalized)) return normalized;
+  return `${IMAGE_BASE_URL}/${tier}/${normalized}`;
+}
+
 export function thumbUrl(filename: string | null | undefined): string {
-  if (!filename) return "";
-  return `${IMAGE_BASE_URL}/thumb/${filename}`;
+  return buildTierUrl("thumb", filename);
 }
 
 export function midUrl(filename: string | null | undefined): string {
-  if (!filename) return "";
-  return `${IMAGE_BASE_URL}/mid/${filename}`;
+  return buildTierUrl("mid", filename);
 }
 
 export function fullUrl(filename: string | null | undefined): string {
-  if (!filename) return "";
-  return `${IMAGE_BASE_URL}/img/${filename}`;
+  return buildTierUrl("img", filename);
 }
 
 export function formatPrice(
